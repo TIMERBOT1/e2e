@@ -233,6 +233,8 @@ async function createSmokeCallScreen(page, adminUrl, state) {
     isEnable: true,
     newCallScreenEnabled: true,
     lineIds: [],
+    screenType: "General",
+    showWaitingPositionsEnabled: false,
     checkpointIds: [],
     displayNameTemplate: '{{Code}}',
     callMode: 'Bell',

@@ -1,0 +1,9 @@
+.env.stand.local
+.e2e-stand-state.json
+test-results
+playwright-report
+stand-videos
+node_modules
+coverage
+artifacts
+.playwright-mcp

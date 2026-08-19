@@ -1,0 +1,61 @@
+name: E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      CALL_TERMINAL_BASE_URL: ${{ secrets.CALL_TERMINAL_BASE_URL }}
+      CI: true
+      PLAYWRIGHT_HTML_OPEN: never
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E cycle
+        run: pnpm full:cycle
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            stand-videos/
+          if-no-files-found: ignore
+          retention-days: 14

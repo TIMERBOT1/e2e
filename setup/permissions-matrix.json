@@ -1,0 +1,1136 @@
+[
+  {
+    "permission": "accessBeacons",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.beacons",
+        "Nav.createBeacon",
+        "Nav.editBeacon",
+        "Nav.beacon"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "accessDaysOff",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.shopDaysOff"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "accessAvailabilities",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.lineStaffManagement",
+        "Nav.createLineStaffManagement",
+        "Nav.editLineStaffManagement"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "accessPlaceLineMonitoring",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/line/line-view.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/components/checkpoint-list-bar/checkpoint-list-bar.tsx"
+      ],
+      "usages": [
+        "line monitoring routes",
+        "line view monitoring tiles",
+        "checkpoint monitoring action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canManageUserAccounts",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.users",
+        "Nav.createUser"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canOpenCheckpoints",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/hooks/use-checkpoint-list-permissions.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/utils/effective-data.ts"
+      ],
+      "usages": [
+        "showEditHostIcon",
+        "canStart"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canCloseCheckpoints",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/hooks/use-checkpoint-list-permissions.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/utils/effective-data.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/components/checkpoint-list-bar/checkpoint-list-bar.tsx"
+      ],
+      "usages": [
+        "showEditHostIcon",
+        "canStop",
+        "finish checkpoints action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canStartHiddenCheckpoint",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/utils/effective-data.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/components/action-state-tiles/action-state-tiles.tsx"
+      ],
+      "usages": [
+        "hidden start action tile",
+        "server guarded StartHidden action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canEditCheckpointWorkingHours",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/utils/effective-data.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/components/work-schedule-card/work-schedule-card.tsx"
+      ],
+      "usages": [
+        "working hours fields readonly/editable",
+        "server guarded working hours update"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canEditCheckpointServices",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host-edit/utils/effective-data.ts",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/checkpoint-host.tsx"
+      ],
+      "usages": [
+        "canEditServices",
+        "checkpoint host services edit"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canChangeCheckpointWorkScheduleMode",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/hooks/use-checkpoint-list-permissions.ts"
+      ],
+      "usages": [
+        "Nav.checkpointWorkSchedule",
+        "canChangeWorkScheduleMode"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canPromoteToAdmin",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/user-edit.tsx"
+      ],
+      "usages": [
+        "Nav.createBrand",
+        "Nav.systemEvents",
+        "Nav.tags",
+        "isAdmin toggle"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canAddAndDeleteShop",
+    "status": "required-e2e",
+    "requires": [
+      "canViewLine",
+      "canUpdateLine",
+      "canViewShop",
+      "canAddAndDeleteLine",
+      "canUpdateShop"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "shop list add button",
+        "shop delete/create affordances"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canAddAndDeleteLine",
+    "status": "required-e2e",
+    "requires": [
+      "canViewLine",
+      "canUpdateLine"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "line list add button",
+        "line delete/create affordances"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canDeletePositions",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx"
+      ],
+      "usages": [
+        "delete position action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canUpdateShop",
+    "status": "required-e2e",
+    "requires": [
+      "canViewLine",
+      "canUpdateLine",
+      "canViewShop"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "Nav.editShop",
+        "shop edit affordance"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canViewShop",
+    "status": "required-e2e",
+    "requires": [
+      "canViewLine"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/shop/shop-view.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "shop view access",
+        "shop permission toggle"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canViewLine",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/line/line-view.tsx"
+      ],
+      "usages": [
+        "Nav.editLine",
+        "line view access"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canUpdateLine",
+    "status": "required-e2e",
+    "requires": [
+      "canViewLine"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "Nav.editLine",
+        "Nav.createCheckpoint",
+        "line edit affordance"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canValidatePositions",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx"
+      ],
+      "usages": [
+        "validate position action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canCallInvalidPositions",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx"
+      ],
+      "usages": [
+        "call invalid position action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canAccessPlaceLineMonitoring",
+    "status": "feature-only",
+    "runtimePermission": "accessPlaceLineMonitoring",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/user-edit.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.Admin.Startup/Features/User/UserProfileQuery.cs"
+      ],
+      "usages": [
+        "user permission toggle",
+        "profile maps CanAccessPlaceLineMonitoring to accessPlaceLineMonitoring",
+        "line monitoring routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageBrands",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.brands",
+        "brand edit/view routes",
+        "line template routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageAppointments",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "appointment list/create/view routes",
+        "scheduler appointment route"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageCampaigns",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "campaign and advertisement routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageTerminals",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "terminal routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageMessagesTemplates",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "shop and line message template routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageJournal",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx"
+      ],
+      "usages": [
+        "Nav.journal",
+        "Nav.positionJournal",
+        "position history action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageDataExport",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.exportData"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageGlobalDataExport",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "Nav.globalExportData",
+        "Nav.globalExportDataCreate"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "manageTranslations",
+    "status": "smoke-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx"
+      ],
+      "usages": [
+        "translation routes"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "displayReducedInterface",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/checkpoint/components/checkpoint-list-bar/checkpoint-list-bar.tsx"
+      ],
+      "usages": [
+        "reduced checkpoint list controls"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-feature.spec.ts"
+    ]
+  },
+  {
+    "permission": "canAddAndEditPositions",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/line-monitoring/line-monitoring.jsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/scheduler-monitoring/scheduler.tsx"
+      ],
+      "usages": [
+        "create/edit position actions",
+        "monitoring add action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canAssignCustomServicePoints",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-edit/position-edit.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/user-edit.tsx"
+      ],
+      "usages": [
+        "checkpoint choice in position edit"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "viewPositions",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-dumb/position.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/user-edit.tsx"
+      ],
+      "usages": [
+        "position visibility mode"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canViewPersonalInfo",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-edit/position-edit.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-actions/index.jsx",
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-dumb/position.tsx"
+      ],
+      "usages": [
+        "personal info fields",
+        "phone visibility"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "dashboardAccess",
+    "status": "inventory-only",
+    "outOfScope": {
+      "reason": "dashboard",
+      "details": "External dashboard tile is visible in admin home, but dashboard behavior is outside admin-web e2e."
+    },
+    "coverage": {
+      "ui": {
+        "positive": false,
+        "negative": false
+      }
+    },
+    "target": {
+      "adminWeb": false,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/home/components/home-tiles.tsx"
+      ],
+      "usages": [
+        "HomeTiles-Dashboard external link"
+      ]
+    }
+  },
+  {
+    "permission": "canListenAudioRecordings",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/journal/journal-item.jsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/position-journal/journal-item.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/features/position-journal-details-view-modal/components/details-tabls/details-tabs.tsx"
+      ],
+      "usages": [
+        "audio recording controls in journal"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canBookFutureDayToOtherPlacesAtBrand",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/appointment-form-dialog/steps/date-time/date-time.tsx",
+        "src/Backoffice/src/JeFile.Admin.Startup/Features/Management/GetServiceDateTimesQuery..cs"
+      ],
+      "usages": [
+        "future date book-in-other-offices action",
+        "future slots server guard"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/terminal/booking.spec.ts"
+    ]
+  },
+  {
+    "permission": "canBookTodayToOtherPlacesAtBrand",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "affordance",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/features/appointment-form-dialog/steps/date-time/date-time.tsx",
+        "src/Backoffice/src/JeFile.Admin.Startup/Features/Management/GetServiceDateTimesQuery..cs"
+      ],
+      "usages": [
+        "today date book-in-other-offices action",
+        "today slots server guard"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/terminal/booking.spec.ts"
+    ]
+  },
+  {
+    "permission": "canEditPositionsAndAppointmentInJournal",
+    "status": "feature-only",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "action",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/journal/journal.jsx",
+        "src/Backoffice/src/JeFile.WebClient/src/features/monitoring-position-edit/monitoring-position-edit.tsx"
+      ],
+      "usages": [
+        "edit appointment route exception",
+        "journal edit action"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/admin/line-monitoring.spec.ts"
+    ]
+  },
+  {
+    "permission": "canViewAppointments",
+    "status": "required-e2e",
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "manageAppointments derived route guard",
+        "appointments permission toggle"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  },
+  {
+    "permission": "canEditAppointments",
+    "status": "required-e2e",
+    "requires": [
+      "canViewAppointments"
+    ],
+    "coverage": {
+      "ui": {
+        "positive": true,
+        "negative": true
+      }
+    },
+    "target": {
+      "adminWeb": true,
+      "kind": "route",
+      "files": [
+        "src/Backoffice/src/JeFile.WebClient/src/pages/backoffice-routing.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/appointments/appointments-filter-large-layout.tsx",
+        "src/Backoffice/src/JeFile.WebClient/src/pages/user/edit-form/switch-dependencies.ts"
+      ],
+      "usages": [
+        "appointment create/edit routes",
+        "appointments edit controls"
+      ]
+    },
+    "refs": [
+      "e2e/setup/permissions-ui.mjs",
+      "e2e/specs/permissions/permissions-smoke.spec.ts"
+    ]
+  }
+]

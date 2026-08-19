@@ -1,0 +1,24 @@
+{
+  "name": "vneocheredi-e2e",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.12.4",
+  "scripts": {
+    "test": "node -e \"const { spawnSync } = require('node:child_process'); const args = process.argv.slice(1); const paths = args.some((arg) => !arg.startsWith('-')) ? [] : ['specs/admin', 'specs/terminal']; const child = spawnSync('playwright', ['test', ...paths, ...args], { stdio: 'inherit', shell: process.platform === 'win32' }); process.exit(child.status ?? 1)\" --",
+    "admin:coverage:check": "node setup/check-admin-coverage-matrix.mjs",
+    "admin:coverage:report": "node setup/render-admin-coverage-report.mjs",
+    "permissions:coverage:check": "node setup/check-admin-permissions-matrix.mjs",
+    "permissions:prepare": "node setup/prepare-permissions.mjs",
+    "permissions:test": "playwright test specs/permissions",
+    "permissions:cleanup": "node setup/cleanup-permissions.mjs",
+    "permissions:cycle": "node setup/cycle-permissions.mjs",
+    "full:cycle": "node setup/cycle-full.mjs",
+    "stand:prepare": "node setup/prepare-stand.mjs",
+    "stand:cleanup": "node setup/cleanup-stand.mjs",
+    "stand:cycle": "node setup/cycle-stand.mjs",
+    "test:video": "STAND_VIDEO=on STAND_SLOW_MO_MS=${STAND_SLOW_MO_MS:-250} playwright test specs/admin specs/terminal"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

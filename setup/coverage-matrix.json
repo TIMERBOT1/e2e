@@ -1,0 +1,1488 @@
+[
+  {
+    "nav": "Nav.index()",
+    "status": "smoke-only",
+    "path": "/",
+    "component": "Home",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "selector": "[data-test^='HomeTiles-']"
+    }
+  },
+  {
+    "nav": "Nav.brands()",
+    "status": "smoke-only",
+    "path": "/brands",
+    "component": "BrandList",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getBrandList"
+    }
+  },
+  {
+    "nav": "Nav.createBrand()",
+    "status": "smoke-only",
+    "path": "/brands/create",
+    "component": "BrandEdit",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getBrand"
+    }
+  },
+  {
+    "nav": "Nav.editBrand(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/edit",
+    "component": "BrandEdit",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getBrand"
+    }
+  },
+  {
+    "nav": "Nav.viewBrand(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId",
+    "component": "BrandView",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getBrandSimplified"
+    }
+  },
+  {
+    "nav": "Nav.createLineTemplate(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/lineTemplates/create",
+    "component": "LineTemplateSettings",
+    "permission": "!insecurePassword && manageBrands && canUpdateLine",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getLineTemplate"
+    }
+  },
+  {
+    "nav": "Nav.editBrandNotifications(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/notifications",
+    "component": "BrandNotificationsEdit",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getBrandNotifications"
+    }
+  },
+  {
+    "nav": "Nav.brandClients(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/clients",
+    "component": "BrandClients",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "selector": "form input[type=\"number\"]"
+    }
+  },
+  {
+    "nav": "Nav.lineTemplates(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/lineTemplates",
+    "component": "LineTemplateList",
+    "permission": "!insecurePassword && manageBrands && canUpdateLine",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getLineTemplateList",
+      "text": "$lineTemplate.name"
+    }
+  },
+  {
+    "nav": "Nav.lineTemplate(':brandId', ':lineTemplateId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/lineTemplates/:lineTemplateId",
+    "component": "LineTemplateView",
+    "permission": "!insecurePassword && manageBrands && canUpdateLine",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id",
+      "lineTemplateId": "$lineTemplate.id"
+    },
+    "assert": {
+      "apiWait": "getLineTemplateSimplified"
+    }
+  },
+  {
+    "nav": "Nav.lineTemplateEdit(':brandId', ':lineTemplateId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/lineTemplates/:lineTemplateId/edit",
+    "component": "LineTemplateEdit",
+    "permission": "!insecurePassword && manageBrands && canUpdateLine",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id",
+      "lineTemplateId": "$lineTemplate.id"
+    },
+    "assert": {
+      "apiWait": "getTemplateBoundedLines"
+    }
+  },
+  {
+    "nav": "Nav.editBrandRestrictions(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/restrictions",
+    "component": "BrandRestrictionsEdit",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getBrandRestrictions"
+    }
+  },
+  {
+    "nav": "Nav.editBrandIntegrations(':brandId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/integrations",
+    "component": "BrandIntegrationsEdit",
+    "permission": "!insecurePassword && manageBrands",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id"
+    },
+    "assert": {
+      "apiWait": "getBrandApiKeys"
+    }
+  },
+  {
+    "nav": "Nav.lineTemplateSettings(':brandId', ':lineTemplateId')",
+    "status": "smoke-only",
+    "path": "/brands/:brandId/lineTemplates/:lineTemplateId/settings",
+    "component": "LineTemplateSettings",
+    "permission": "!insecurePassword && manageBrands && canUpdateLine",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "brandId": "$brand.id",
+      "lineTemplateId": "$lineTemplate.id"
+    },
+    "assert": {
+      "apiWait": "getLineTemplate"
+    }
+  },
+  {
+    "nav": "Nav.messageTemplates()",
+    "status": "smoke-only",
+    "path": "/templates",
+    "component": "MessageTemplates",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getMessageTemplatesConfig"
+    }
+  },
+  {
+    "nav": "Nav.shopMessageTemplates(':placeId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/templates",
+    "component": "MessageTemplates",
+    "permission": "!insecurePassword && manageMessagesTemplates",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getMessageTemplatesConfig"
+    }
+  },
+  {
+    "nav": "Nav.lineMessageTemplates(':placeId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/templates",
+    "component": "MessageTemplates",
+    "permission": "!insecurePassword && manageMessagesTemplates",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getMessageTemplatesConfig"
+    }
+  },
+  {
+    "nav": "Nav.appointmentPlaceList()",
+    "status": "smoke-only",
+    "path": "/appointmentPlaceList",
+    "component": "AppointmentShopList",
+    "permission": "!insecurePassword && manageAppointments",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getAppointmentPlaceList"
+    }
+  },
+  {
+    "nav": "Nav.createAppointment()",
+    "status": "smoke-only",
+    "path": "/appointments/create",
+    "component": "Appointment",
+    "permission": "!insecurePassword && manageAppointments && canEditAppointments",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "text": "Очередь и точка обслуживания"
+    }
+  },
+  {
+    "nav": "Nav.createAppointmentLine(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/appointments/create",
+    "component": "Appointment",
+    "permission": "!insecurePassword && manageAppointments && canEditAppointments",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$appointment.shopId",
+      "lineId": "$appointment.lineId"
+    },
+    "assert": {
+      "text": "Очередь и точка обслуживания"
+    }
+  },
+  {
+    "nav": "Nav.createAppointmentFromService()",
+    "status": "smoke-only",
+    "path": "/appointments/create-from-service",
+    "component": "FindAndCreateAppointment",
+    "permission": "!insecurePassword && manageAppointments && canEditAppointments",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTimeSearchingPossibleServiceList"
+    }
+  },
+  {
+    "nav": "Nav.viewAppointment(':appointmentId')",
+    "status": "smoke-only",
+    "path": "/appointments/:appointmentId",
+    "component": "AppointmentView",
+    "permission": "!insecurePassword && manageAppointments",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "appointmentId": "$appointment.token"
+    },
+    "assert": {
+      "apiWait": "reports/getAppointment"
+    }
+  },
+  {
+    "nav": "Nav.editAppointment(':appointmentId')",
+    "status": "smoke-only",
+    "path": "/appointments/:appointmentId/edit",
+    "component": "Appointment",
+    "permission": "!insecurePassword && !!(manageAppointments || canEditPositionsAndAppointmentInJournal) && canEditAppointments",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "appointmentId": "$appointment.token"
+    },
+    "assert": {
+      "apiWait": "reports/getAppointment"
+    }
+  },
+  {
+    "nav": "Nav.appointments()",
+    "status": "smoke-only",
+    "path": "/appointments",
+    "component": "Appointments",
+    "permission": "!insecurePassword && userManageAppointments",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "text": "Укажите критерии поиска"
+    }
+  },
+  {
+    "nav": "Nav.appointmentsLine(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/appointments",
+    "component": "Appointments",
+    "permission": "!insecurePassword && userManageAppointments",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$appointment.shopId",
+      "lineId": "$appointment.lineId"
+    },
+    "assert": {
+      "text": "Укажите критерии поиска"
+    }
+  },
+  {
+    "nav": "Nav.viewAppointmentLine(':shopId', ':lineId', ':appointmentId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/appointments/:appointmentId",
+    "component": "AppointmentView",
+    "permission": "!insecurePassword && manageAppointments",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$appointment.shopId",
+      "lineId": "$appointment.lineId",
+      "appointmentId": "$appointment.token"
+    },
+    "assert": {
+      "apiWait": "reports/getAppointment"
+    }
+  },
+  {
+    "nav": "Nav.journal()",
+    "status": "smoke-only",
+    "path": "/journal",
+    "component": "Journal",
+    "permission": "!insecurePassword && manageJournal",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "reports/getJournal"
+    }
+  },
+  {
+    "nav": "Nav.positionJournal()",
+    "status": "smoke-only",
+    "path": "/position-journal",
+    "component": "PositionJournal",
+    "permission": "!insecurePassword && manageJournal",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "reports/getPositionJournal"
+    }
+  },
+  {
+    "nav": "Nav.systemEvents()",
+    "status": "smoke-only",
+    "path": "/system-events",
+    "component": "SystemEvents",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "systemEvents/list"
+    }
+  },
+  {
+    "nav": "Nav.createTerminal()",
+    "status": "smoke-only",
+    "path": "/terminals/create",
+    "component": "TerminalEdit",
+    "permission": "!insecurePassword && manageTerminals",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": [
+        "getTerminal",
+        "getShopListSimplified"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.editTerminal(':terminalId')",
+    "status": "smoke-only",
+    "path": "/terminals/:terminalId/edit",
+    "component": "TerminalEdit",
+    "permission": "!insecurePassword && manageTerminals",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "terminalId": "$scenarios.asap.terminalAdminId"
+    },
+    "assert": {
+      "apiWait": [
+        "getTerminal",
+        "getShopListSimplified"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.terminal(':terminalId')",
+    "status": "smoke-only",
+    "path": "/terminals/:terminalId",
+    "component": "TerminalView",
+    "permission": "!insecurePassword && manageTerminals",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "terminalId": "$scenarios.asap.terminalAdminId"
+    },
+    "assert": {
+      "apiWait": "getTerminal",
+      "text": "$scenarios.asap.terminalName"
+    }
+  },
+  {
+    "nav": "Nav.terminals()",
+    "status": "smoke-only",
+    "path": "/terminals",
+    "component": "TerminalList",
+    "permission": "!insecurePassword && manageTerminals",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTerminalList",
+      "text": "$scenarios.asap.terminalName"
+    }
+  },
+  {
+    "nav": "Nav.createAdvertisement(':campaignId')",
+    "status": "smoke-only",
+    "path": "/campaigns/:campaignId/advertisements/create",
+    "component": "AdvertisementEdit",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "campaignId": "$campaign.id"
+    },
+    "assert": {
+      "apiWait": "getAdvt"
+    }
+  },
+  {
+    "nav": "Nav.editAdvertisement(':campaignId', ':advertisementId')",
+    "status": "smoke-only",
+    "path": "/campaigns/:campaignId/advertisements/:advertisementId/edit",
+    "component": "AdvertisementEdit",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "campaignId": "$campaign.id",
+      "advertisementId": "$advertisement.id"
+    },
+    "assert": {
+      "apiWait": "getAdvt"
+    }
+  },
+  {
+    "nav": "Nav.advertisements(':campaignId')",
+    "status": "smoke-only",
+    "path": "/campaigns/:campaignId/advertisements",
+    "component": "AdvertisementList",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "campaignId": "$campaign.id"
+    },
+    "assert": {
+      "apiWait": "getAdvtList",
+      "text": "$advertisement.name"
+    }
+  },
+  {
+    "nav": "Nav.createCampaign()",
+    "status": "smoke-only",
+    "path": "/campaigns/create",
+    "component": "CampaignEdit",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getCampaignsPlaceList"
+    }
+  },
+  {
+    "nav": "Nav.editCampaign(':campaignId', ':mode')",
+    "status": "smoke-only",
+    "path": "/campaigns/:campaignId/:mode",
+    "component": "CampaignEdit",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "campaignId": "$campaign.id",
+      "mode": "edit"
+    },
+    "assert": {
+      "apiWait": "getCampaign"
+    }
+  },
+  {
+    "nav": "Nav.campaign(':campaignId')",
+    "status": "smoke-only",
+    "path": "/campaigns/:campaignId",
+    "component": "CampaignView",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "campaignId": "$campaign.id"
+    },
+    "assert": {
+      "apiWait": "getCampaign"
+    }
+  },
+  {
+    "nav": "Nav.campaigns()",
+    "status": "smoke-only",
+    "path": "/campaigns",
+    "component": "CampaignList",
+    "permission": "!insecurePassword && manageCampaigns",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getCampaignList",
+      "text": "$campaign.name"
+    }
+  },
+  {
+    "nav": "Nav.createUser()",
+    "status": "smoke-only",
+    "path": "/users/create",
+    "component": "UserEdit",
+    "permission": "!insecurePassword && canManageUserAccounts",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getUser"
+    }
+  },
+  {
+    "nav": "Nav.editUser(':userId')",
+    "status": "smoke-only",
+    "path": "/users/:userId/edit",
+    "component": "UserEdit",
+    "permission": "",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "userId": "$currentUserId"
+    },
+    "assert": {
+      "apiWait": "getUser"
+    }
+  },
+  {
+    "nav": "Nav.users()",
+    "status": "smoke-only",
+    "path": "/users",
+    "component": "UserList",
+    "permission": "!insecurePassword && canManageUserAccounts",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getUserList"
+    }
+  },
+  {
+    "nav": "Nav.createBeacon(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/beacons/create",
+    "component": "BeaconEdit",
+    "permission": "!insecurePassword && accessBeacons",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$beacon.shopId"
+    },
+    "assert": {
+      "apiWait": "getBeacon"
+    }
+  },
+  {
+    "nav": "Nav.editBeacon(':shopId', ':beaconId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/beacons/:beaconId/edit",
+    "component": "BeaconEdit",
+    "permission": "!insecurePassword && accessBeacons",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$beacon.shopId",
+      "beaconId": "$beacon.id"
+    },
+    "assert": {
+      "apiWait": "getBeacon"
+    }
+  },
+  {
+    "nav": "Nav.beacon(':shopId', ':beaconId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/beacons/:beaconId",
+    "component": "BeaconView",
+    "permission": "!insecurePassword && accessBeacons",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$beacon.shopId",
+      "beaconId": "$beacon.id"
+    },
+    "assert": {
+      "apiWait": "getBeacon"
+    }
+  },
+  {
+    "nav": "Nav.beacons(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/beacons",
+    "component": "BeaconList",
+    "permission": "!insecurePassword && accessBeacons",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$beacon.shopId"
+    },
+    "assert": {
+      "apiWait": "getBeaconList",
+      "text": "$beacon.name"
+    }
+  },
+  {
+    "nav": "Nav.createLineStaffManagement(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/staffManagement/create",
+    "component": "StaffManagementEdit",
+    "permission": "!insecurePassword && accessAvailabilities",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.futureFinal.lineId"
+    },
+    "assert": {
+      "apiWait": "getStaffManagementRecord"
+    }
+  },
+  {
+    "nav": "Nav.editLineStaffManagement(':shopId', ':lineId', ':managementId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/staffManagement/:managementId",
+    "component": "StaffManagementEdit",
+    "permission": "!insecurePassword && accessAvailabilities",
+    "action": "Edit",
+    "fixture": "$scenarios.futureFinal.staffManagementIds[0]",
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.futureFinal.lineId",
+      "managementId": "$scenarios.futureFinal.staffManagementIds[0]"
+    },
+    "assert": {
+      "apiWait": "getStaffManagementRecord"
+    }
+  },
+  {
+    "nav": "Nav.lineStaffManagement(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/staffManagement",
+    "component": "StaffManagementList",
+    "permission": "!insecurePassword && accessAvailabilities",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.futureFinal.lineId"
+    },
+    "assert": {
+      "apiWait": "getStaffManagement"
+    }
+  },
+  {
+    "nav": "Nav.checkpointHost(':shopId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/host",
+    "component": "CheckpointHost",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": [
+        "getCheckpointMonitoring",
+        "getLine"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.lineDelay(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/lineMonitoring/delay",
+    "component": "LineDelay",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getLine"
+    }
+  },
+  {
+    "nav": "Nav.checkpointDelay(':shopId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/monitoring/delay",
+    "component": "LineDelay",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": "getLine"
+    }
+  },
+  {
+    "nav": "Nav.checkpointMonitoring(':shopId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/monitoring",
+    "component": "CheckpointMonitoring",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": "getCheckpointNightClubMonitoring"
+    }
+  },
+  {
+    "nav": "Nav.checkpointMonitoringCreate(':placeId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/checkpoints/:checkpointId/monitoring/create",
+    "component": "CheckpointMonitoringEdit",
+    "permission": "!insecurePassword",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.checkpointMonitoringEdit(':placeId', ':lineId', ':checkpointId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/checkpoints/:checkpointId/monitoring/:positionId/edit",
+    "component": "CheckpointMonitoringEdit",
+    "permission": "!insecurePassword",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "checkpointId": "$scenarios.noSlots.checkpointId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.checkpointMonitoringPosition(':shopId', ':lineId', ':checkpointId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/monitoring/:positionId",
+    "component": "CheckpointMonitoring",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "checkpointId": "$scenarios.noSlots.checkpointId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "getCheckpointNightClubMonitoring"
+    }
+  },
+  {
+    "nav": "Nav.createCheckpoint(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/create",
+    "component": "CheckpointEdit",
+    "permission": "!insecurePassword && (canUpdateLine || canUpdateShop)",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": [
+        "getCheckpoint",
+        "getCheckpointBeaconList",
+        "getLine"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.editCheckpoint(':shopId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/edit",
+    "component": "CheckpointEdit",
+    "permission": "!insecurePassword && (canUpdateLine || canUpdateShop)",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": [
+        "getCheckpoint",
+        "getLine"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.checkpointWorkSchedule(':shopId', ':lineId', ':checkpointId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints/:checkpointId/workSchedule",
+    "component": "CheckpointWorkSchedule",
+    "permission": "!insecurePassword && canChangeCheckpointWorkScheduleMode",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId",
+      "checkpointId": "$scenarios.asap.checkpointId"
+    },
+    "assert": {
+      "apiWait": [
+        "getCheckpoint",
+        "getCheckpointSettings"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.checkpoints(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/checkpoints",
+    "component": "CheckpointList",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getCheckpointList",
+      "text": "$scenarios.asap.checkpointName"
+    }
+  },
+  {
+    "nav": "Nav.checkpoints(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/checkpoints",
+    "component": "CheckpointList",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getCheckpointList"
+    }
+  },
+  {
+    "nav": "Nav.lineMonitoringCreate(':placeId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/monitoring/create",
+    "component": "LineMonitoringEdit",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.lineMonitoringEdit(':placeId', ':lineId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/monitoring/:positionId/edit",
+    "component": "LineMonitoringEdit",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.basicLineMonitoringCreate(':placeId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/lineMonitoring/create",
+    "component": "BasicLineMonitoringEdit",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.basicLineMonitoringEdit(':placeId', ':lineId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:placeId/lines/:lineId/lineMonitoring/:positionId/edit",
+    "component": "BasicLineMonitoringEdit",
+    "permission": "!insecurePassword && !!(accessPlaceLineMonitoring || canEditPositionsAndAppointmentInJournal)",
+    "action": "None",
+    "fixture": "$scenarios.noSlots.reservedPositionIds[0]",
+    "params": {
+      "placeId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "management/position/editForm"
+    }
+  },
+  {
+    "nav": "Nav.basicLineMonitoringPosition(':shopId', ':lineId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/lineMonitoring/:positionId",
+    "component": "BasicLineMonitoring",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": "$scenarios.noSlots.reservedPositionIds[0]",
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "getLineNightClubMonitoring"
+    }
+  },
+  {
+    "nav": "Nav.basicLineMonitoring(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/lineMonitoring",
+    "component": "BasicLineMonitoring",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId"
+    },
+    "assert": {
+      "apiWait": "getLineNightClubMonitoring"
+    }
+  },
+  {
+    "nav": "Nav.lineMonitoring(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/monitoring",
+    "component": "LineMonitoring",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId"
+    },
+    "assert": {
+      "apiWait": "getLineMonitoring",
+      "text": ["Мониторинг временных слотов", "Timeslots monitoring"]
+    }
+  },
+  {
+    "nav": "Nav.lineScheduler(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/scheduler",
+    "component": "SchedulerMonitoring",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId"
+    },
+    "assert": {
+      "apiWait": "getLineNightClubMonitoring"
+    }
+  },
+  {
+    "nav": "Nav.lineAppointmentScheduler(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/appointmentScheduler",
+    "component": "SchedulerAppointment",
+    "permission": "!insecurePassword && manageAppointments",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$appointment.shopId",
+      "lineId": "$appointment.lineId"
+    },
+    "assert": {
+      "apiWait": "reports/getAppointments"
+    }
+  },
+  {
+    "nav": "Nav.lineMonitoringPosition(':shopId', ':lineId', ':positionId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/monitoring/:positionId",
+    "component": "LineMonitoring",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.noSlots.lineId",
+      "positionId": "$scenarios.noSlots.reservedPositionIds[0]"
+    },
+    "assert": {
+      "apiWait": "getLineMonitoring",
+      "text": ["Мониторинг временных слотов", "Timeslots monitoring"]
+    }
+  },
+  {
+    "nav": "Nav.lineMonitoringState(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/lineMonitoringState",
+    "component": "LineMonitoringStatistics",
+    "permission": "!insecurePassword && accessPlaceLineMonitoring",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "monitoring/monitoringLineStatisticsQuery"
+    }
+  },
+  {
+    "nav": "Nav.createLine(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/create",
+    "component": "LineEdit",
+    "permission": "!insecurePassword && canAddAndDeleteLine",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getLine"
+    }
+  },
+  {
+    "nav": "Nav.editLine(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/edit",
+    "component": "LineEdit",
+    "permission": "!insecurePassword && (canViewLine || canUpdateLine)",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getLine"
+    }
+  },
+  {
+    "nav": "Nav.lineServicesDependency(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId/servicesDependency",
+    "component": "LineServicesDependency",
+    "permission": "!insecurePassword",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getLineServicesDependencies"
+    }
+  },
+  {
+    "nav": "Nav.line(':shopId', ':lineId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines/:lineId",
+    "component": "LineView",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id",
+      "lineId": "$scenarios.asap.lineId"
+    },
+    "assert": {
+      "apiWait": "getLine",
+      "text": "$scenarios.asap.lineName"
+    }
+  },
+  {
+    "nav": "Nav.lines(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/lines",
+    "component": "LineList",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getLineListSimplified",
+      "text": "$scenarios.asap.lineName"
+    }
+  },
+  {
+    "nav": "Nav.shopDaysOff(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/daysOff",
+    "component": "ShopDaysOff",
+    "permission": "!insecurePassword && accessDaysOff",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getShopDaysOff"
+    }
+  },
+  {
+    "nav": "Nav.createShopCallScreen(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/callScreens/create",
+    "component": "ShopCallScreenEdit",
+    "permission": "!insecurePassword",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$callScreen.shopId"
+    },
+    "assert": {
+      "apiWait": "getCallScreen"
+    }
+  },
+  {
+    "nav": "Nav.editShopCallScreen(':shopId', ':callScreenId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/callScreens/:callScreenId/edit",
+    "component": "ShopCallScreenEdit",
+    "permission": "!insecurePassword",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$callScreen.shopId",
+      "callScreenId": "$callScreen.id"
+    },
+    "assert": {
+      "apiWait": "getCallScreen"
+    }
+  },
+  {
+    "nav": "Nav.shopCallScreen(':shopId', ':callScreenId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/callScreens/:callScreenId",
+    "component": "ShopCallScreenView",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$callScreen.shopId",
+      "callScreenId": "$callScreen.id"
+    },
+    "assert": {
+      "apiWait": "getCallScreen"
+    }
+  },
+  {
+    "nav": "Nav.shopCallScreens(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/callScreens",
+    "component": "ShopCallScreens",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$callScreen.shopId"
+    },
+    "assert": {
+      "apiWait": "getCallScreensList",
+      "text": "$callScreen.name"
+    }
+  },
+  {
+    "nav": "Nav.exportData(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/exportData",
+    "component": "ShopExportData",
+    "permission": "!insecurePassword && manageDataExport",
+    "action": "None",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getExportTemplates"
+    }
+  },
+  {
+    "nav": "Nav.globalExportData()",
+    "status": "smoke-only",
+    "path": "/exportData",
+    "component": "ExportDataList",
+    "permission": "!insecurePassword && manageGlobalDataExport",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "statistics/getExportDataReports"
+    }
+  },
+  {
+    "nav": "Nav.globalExportDataCreate()",
+    "status": "smoke-only",
+    "path": "/exportData/create",
+    "component": "ExportDataCreate",
+    "permission": "!insecurePassword && manageGlobalDataExport",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "statistics/getExportTemplates"
+    }
+  },
+  {
+    "nav": "Nav.createShop()",
+    "status": "smoke-only",
+    "path": "/shops/create",
+    "component": "ShopEdit",
+    "permission": "!insecurePassword && canAddAndDeleteShop",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": [
+        "getShop",
+        "getBrandList",
+        "getTranslationConfig"
+      ]
+    }
+  },
+  {
+    "nav": "Nav.editShop(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId/edit",
+    "component": "ShopEdit",
+    "permission": "!insecurePassword && canUpdateShop",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getShop"
+    }
+  },
+  {
+    "nav": "Nav.shop(':shopId')",
+    "status": "smoke-only",
+    "path": "/shops/:shopId",
+    "component": "ShopView",
+    "permission": "!insecurePassword",
+    "action": "View",
+    "fixture": null,
+    "params": {
+      "shopId": "$place.id"
+    },
+    "assert": {
+      "apiWait": "getShop",
+      "text": "$place.name"
+    }
+  },
+  {
+    "nav": "Nav.shops()",
+    "status": "smoke-only",
+    "path": "/shops",
+    "component": "ShopList",
+    "permission": "!insecurePassword",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getShopListSimplified",
+      "text": "$place.name"
+    }
+  },
+  {
+    "nav": "Nav.createTranslation()",
+    "status": "smoke-only",
+    "path": "/translations/create",
+    "component": "TranslationEdit",
+    "permission": "!insecurePassword && manageTranslations",
+    "action": "Edit",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTranslationConfig"
+    }
+  },
+  {
+    "nav": "Nav.editTranslation(':translationId')",
+    "status": "smoke-only",
+    "path": "/translations/:translationId",
+    "component": "TranslationEdit",
+    "permission": "!insecurePassword && manageTranslations",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "translationId": "$translation.id"
+    },
+    "assert": {
+      "apiWait": "getTranslation"
+    }
+  },
+  {
+    "nav": "Nav.translations()",
+    "status": "smoke-only",
+    "path": "/translations",
+    "component": "TranslationList",
+    "permission": "!insecurePassword && manageTranslations",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTranslationList",
+      "text": "$translation.sourceText"
+    }
+  },
+  {
+    "nav": "Nav.tags()",
+    "status": "smoke-only",
+    "path": "/tags",
+    "component": "Tags",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "View",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTagItemsList",
+      "text": "$tag.name"
+    }
+  },
+  {
+    "nav": "Nav.createTag()",
+    "status": "smoke-only",
+    "path": "/tags/create",
+    "component": "TagEdit",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "None",
+    "fixture": null,
+    "params": {},
+    "assert": {
+      "apiWait": "getTagEditForm"
+    }
+  },
+  {
+    "nav": "Nav.editTag(':tagId')",
+    "status": "smoke-only",
+    "path": "/tags/:tagId/edit",
+    "component": "TagEdit",
+    "permission": "!insecurePassword && canPromoteToAdmin",
+    "action": "Edit",
+    "fixture": null,
+    "params": {
+      "tagId": "$tag.id"
+    },
+    "assert": {
+      "apiWait": "getTagEditForm"
+    }
+  }
+]

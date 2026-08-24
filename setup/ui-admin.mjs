@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test'
 import { poll, saveState, unwrapData, unwrapList } from './shared.mjs'
 
 const saveButton = /^Сохранить$/i
@@ -532,6 +533,8 @@ export async function startUiCheckpoint(page, adminUrl, shopId, lineId, checkpoi
   await page.locator('[data-test="CheckpointHost-WorkScheduleMode-lineSchedule"]').click()
   const allServices = page.locator('[data-test="CheckpointHost-AllServices"]')
   if ((await allServices.textContent()).trim() === 'Выбрать все') await allServices.click()
+  await expect(page.locator('[data-test="CheckpointHost-AllServices"]')).not.toHaveText(/Выбрать все/)
+  await expect(page.locator('[data-test="CheckpointHost-ApplyButton"]')).toBeEnabled()
   const hostPath = `/checkpoints/${checkpointId}/host`
   const [response] = await Promise.all([
     page.waitForResponse((item) => responseHas(item, '/api/updateCheckpointHost', ['PUT']), { timeout: 30_000 }),

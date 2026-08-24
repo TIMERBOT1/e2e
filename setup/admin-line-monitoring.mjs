@@ -15,9 +15,12 @@ function digits(value) {
 }
 
 function datePart(offsetDays = 0) {
-  const date = new Date()
-  date.setDate(date.getDate() + offsetDays)
-  return String(date.getDate()).padStart(2, '0')
+  const date = new Date(Date.now() + offsetDays * 24 * 60 * 60 * 1000)
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    timeZone: 'Asia/Yekaterinburg'
+  }).formatToParts(date)
+  return parts.find((part) => part.type === 'day')?.value || ''
 }
 
 function localSlotDateKey(value) {
@@ -70,12 +73,15 @@ async function clickButton(page, name) {
   await button.click()
 }
 
-async function clickDrawerNext(page) {
+async function clickDrawerNext(page, expectedHeading) {
   const textAction = page.getByText('Далее', { exact: true }).last()
   const actionButton = textAction.locator('xpath=ancestor::button[1]')
   await expect(actionButton).toBeVisible({ timeout: 30_000 })
   await expect(actionButton).toBeEnabled()
   await actionButton.dispatchEvent('click')
+  if (expectedHeading) {
+    await expect(page.getByText(expectedHeading, { exact: true }).last()).toBeVisible({ timeout: 30_000 })
+  }
 }
 
 async function fillField(page, label, value) {
@@ -151,27 +157,36 @@ async function setSwitchNearText(page, text, desired) {
     const label = labels.nth(i)
     if (!(await label.isVisible().catch(() => false))) continue
 
-    const input = label
-      .locator('xpath=ancestor::*[.//input[@type="checkbox"]][1]')
-      .locator('input[type="checkbox"]')
-      .first()
+    const container = label.locator('xpath=ancestor::*[.//input or .//*[@role="switch"] or .//*[@aria-pressed]][1]')
+    const input = container.locator('input[type="checkbox"]').first()
     if (await input.count()) {
       if ((await input.isChecked()) === Boolean(desired)) return
       if (await input.isDisabled()) continue
-
       await input.setChecked(Boolean(desired))
       await expect(input).toBeChecked({ checked: Boolean(desired) })
       return
     }
 
-    const toggle = label
-      .locator('xpath=ancestor::*[.//*[@role="switch"]][1]')
-      .getByRole('switch')
-      .first()
-    if (!(await toggle.count()) || (await toggle.isDisabled().catch(() => false))) continue
-    const checked = (await toggle.getAttribute('aria-checked')) === 'true'
+    const toggle = container.locator('[role="switch"], [aria-pressed]').first()
+    if (!(await toggle.count())) {
+      const fallback = page.getByRole('switch').last()
+      if (await fallback.count()) {
+        const checked = (await fallback.getAttribute('aria-checked')) === 'true'
+        if (checked !== Boolean(desired)) await fallback.click()
+        await expect.poll(async () => (await fallback.getAttribute('aria-checked')) === 'true')
+          .toBe(Boolean(desired))
+        return
+      }
+      continue
+    }
+    if (await toggle.isDisabled().catch(() => false)) continue
+    const checked = (await toggle.getAttribute('aria-checked')) === 'true' ||
+      (await toggle.getAttribute('aria-pressed')) === 'true'
     if (checked !== Boolean(desired)) await toggle.click()
-    await expect(toggle).toHaveAttribute('aria-checked', String(Boolean(desired)))
+    await expect.poll(async () =>
+      (await toggle.getAttribute('aria-checked')) === 'true' ||
+      (await toggle.getAttribute('aria-pressed')) === 'true'
+    ).toBe(Boolean(desired))
     return
   }
 
@@ -179,20 +194,22 @@ async function setSwitchNearText(page, text, desired) {
 }
 
 async function chooseMonitoringDialogTime(page, kind, slotPosition = 'last') {
-  await page.getByText(datePart(), { exact: true }).last().click()
+  const dialog = page.getByRole('dialog').last()
+  const scope = await dialog.count() ? dialog : page.locator('main').last()
+  await scope.getByText(datePart(), { exact: true }).last().click()
 
   if (kind === 'asap') {
-    await expect(page.getByText('Запись как можно скорее', { exact: true })).toBeVisible({ timeout: 30_000 })
+    await expect(scope.getByText('Запись как можно скорее', { exact: true })).toBeVisible({ timeout: 30_000 })
     await setSwitchNearText(page, 'Запись как можно скорее', true)
     return 'asap'
   }
 
   await setSwitchNearText(page, 'Запись как можно скорее', false)
-  const slots = page.getByText(/^\d{1,2}:\d{2}$/)
+  const slots = scope.getByText(/^\d{1,2}:\d{2}$/)
   const slot = slotPosition === 'second' ? slots.nth(1) : slotPosition === 'first' ? slots.first() : slots.last()
   await expect(slot).toBeVisible({ timeout: 30_000 })
   const selectedTime = (await slot.textContent())?.trim()
-  await slot.click()
+  await slot.click({ timeout: 30_000 })
   return selectedTime
 }
 
@@ -213,7 +230,9 @@ async function createAppointmentFromAppointments(page, scenario, person, offsetD
 
   await expect(page.getByRole('heading', { name: 'Выбор даты и времени' })).toBeVisible({ timeout: 30_000 })
   await page.getByText(datePart(offsetDays), { exact: true }).last().click()
-  const slot = page.getByText(/^\d{1,2}:\d{2}$/).last()
+  const dialog = page.getByRole('dialog').last()
+  const scope = await dialog.count() ? dialog : page.locator('main').last()
+  const slot = scope.getByText(/^\d{1,2}:\d{2}$/).last()
   await expect(slot).toBeVisible({ timeout: 30_000 })
   const selectedTime = (await slot.textContent())?.trim()
   await slot.click()
@@ -258,28 +277,27 @@ async function createAppointmentFromPositionJournal(page, scenario, person, offs
   await expect(line).toBeVisible({ timeout: 30_000 })
   await line.click()
   await expect(page.getByText(scenario.serviceName, { exact: true }).last()).toBeVisible({ timeout: 30_000 })
-  await clickDrawerNext(page)
+  await clickDrawerNext(page, 'Выбор места')
 
   await expect(page.getByRole('heading', { name: 'Выбор места' })).toBeVisible({ timeout: 30_000 })
   const place = page.getByText(scenario.placeName, { exact: true }).last()
   await expect(place).toBeVisible({ timeout: 30_000 })
   await place.click()
-  await clickDrawerNext(page)
+  await clickDrawerNext(page, 'Выбор даты и времени')
 
-  await expect(page.getByRole('heading', { name: 'Выбор даты и времени' })).toBeVisible({ timeout: 30_000 })
   await page.getByText(datePart(offsetDays), { exact: true }).last().dispatchEvent('click')
   const slot = page.getByText(/^\d{1,2}:\d{2}$/).first()
   await expect(slot).toBeVisible({ timeout: 30_000 })
   const selectedTime = (await slot.textContent())?.trim()
   await slot.dispatchEvent('click')
-  await clickDrawerNext(page)
+  await clickDrawerNext(page, 'Ввод персональных данных')
 
   await expect(page.getByText('Ввод персональных данных', { exact: true }).last()).toBeVisible({ timeout: 30_000 })
   await fillField(page, 'Фамилия', person.lastName)
   await fillField(page, 'Имя и отчество', person.firstName)
   await fillField(page, 'Адрес электронной почты', person.email)
   await fillJournalPhoneField(page, person.phone)
-  await clickDrawerNext(page)
+  await clickDrawerNext(page, 'Проверка данных')
 
   await expect(page.getByText('Проверка данных', { exact: true }).last()).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText(scenario.serviceName, { exact: true }).last()).toBeVisible()

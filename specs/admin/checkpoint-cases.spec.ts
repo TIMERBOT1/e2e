@@ -150,12 +150,20 @@ async function fillControl(page: Page, testId: string, value: string) {
 }
 
 function timeText(offsetMinutes: number) {
-  const date = new Date(Date.now() + offsetMinutes * 60_000)
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  return standClock(new Date(Date.now() + offsetMinutes * 60_000))
 }
 
 function clockText(date: Date) {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  return standClock(date)
+}
+
+function standClock(date: Date) {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Yekaterinburg',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).format(date)
 }
 
 async function fillWorkTime(page: Page, testId: string, index: number, value: string) {
@@ -536,9 +544,7 @@ test('TC-39 starts a service point before its scheduled opening', async ({ page 
 
   try {
     const openingOffset = 2
-    const openingTime = new Date()
-    openingTime.setSeconds(0, 0)
-    openingTime.setMinutes(openingTime.getMinutes() + openingOffset)
+    const openingTime = new Date(Date.now() + openingOffset * 60_000)
     const scheduled = await startCheckpoint(page, checkpoint, 'fixed', {
       start: clockText(openingTime),
       end: timeText(10)

@@ -181,8 +181,16 @@ async function fillWorkTime(page: Page, testId: string, index: number, value: st
 
 async function selectAllServices(page: Page) {
   const control = page.locator('[data-test="CheckpointHost-AllServices"]')
+  const services = page.locator('[data-test="CheckpointHost-ServicesCard"]').getByRole('switch')
   await expect(control).toBeVisible({ timeout: 30_000 })
-  if ((await control.textContent())?.trim() === 'Выбрать все') await control.click()
+  await expect(services.first()).toBeAttached()
+  const allSelected = await services.evaluateAll((items) =>
+    items.every((item) => item instanceof HTMLInputElement && item.checked)
+  )
+  if (!allSelected) await control.click()
+  await expect.poll(async () => services.evaluateAll((items) =>
+    items.length > 0 && items.every((item) => item instanceof HTMLInputElement && item.checked)
+  )).toBe(true)
 }
 
 async function setAllDay(page: Page, desired: boolean) {
@@ -552,24 +560,23 @@ test('TC-39 starts a service point before its scheduled opening', async ({ page 
     expect(scheduled.status).toBe('started')
     expect(Number(scheduled.operatingFrom)).toBeGreaterThan(Date.now())
 
-    await open(
-      page,
-      adminUrl(),
-      `/shops/${scenario().shopId}/lines/${scenario().lineId}/checkpoints/${checkpoint.id}/monitoring`
-    )
+    const monitoringPath = `/shops/${scenario().shopId}/lines/${scenario().lineId}/checkpoints/${checkpoint.id}/monitoring`
+    await open(page, adminUrl(), monitoringPath)
     const inactive = page.getByText(/Точка обслуживания (?:закрыта|выключена)/i).first()
-    await expect(inactive).toBeVisible({ timeout: 30_000 })
+    await expect.poll(async () =>
+      page.url().includes(`/checkpoints/${checkpoint.id}/host`) ||
+      await inactive.isVisible().catch(() => false)
+    ).toBe(true)
     const openingWait = Math.max(10_000, openingTime.getTime() + 12_000 - Date.now())
     await poll(() => Date.now() > openingTime.getTime() + 2_000, 'scheduled opening time reached', openingWait)
+    const noOffers = page.getByText('Нет предложений', { exact: true })
     await poll(async () => {
-      await open(
-        page,
-        adminUrl(),
-        `/shops/${scenario().shopId}/lines/${scenario().lineId}/checkpoints/${checkpoint.id}/monitoring`
-      )
-      return !(await inactive.isVisible().catch(() => false))
+      await open(page, adminUrl(), monitoringPath)
+      return page.url().includes(monitoringPath) &&
+        !(await inactive.isVisible().catch(() => false)) &&
+        await noOffers.isVisible().catch(() => false)
     }, 'service point became active after scheduled opening', 90_000)
-    await expect(page.getByText('Нет предложений', { exact: true })).toBeVisible({ timeout: 30_000 })
+    await expect(noOffers).toBeVisible({ timeout: 30_000 })
   } finally {
     await finishCheckpointApi(page, checkpoint).catch(() => {})
   }

@@ -151,52 +151,37 @@ async function fillJournalPhoneField(page, value) {
 }
 
 async function setSwitchNearText(page, text, desired) {
-  const labels = page.getByText(text, { exact: true })
-  const count = await labels.count()
-  for (let i = count - 1; i >= 0; i -= 1) {
-    const label = labels.nth(i)
-    if (!(await label.isVisible().catch(() => false))) continue
+  await expect(page.getByText(text, { exact: true }).last()).toBeVisible({ timeout: 30_000 })
+  const toggle = page.getByRole('switch').last()
+  await expect(toggle).toBeAttached({ timeout: 30_000 })
 
-    const container = label.locator('xpath=ancestor::*[.//input or .//*[@role="switch"] or .//*[@aria-pressed]][1]')
-    const input = container.locator('input[type="checkbox"]').first()
-    if (await input.count()) {
-      if ((await input.isChecked()) === Boolean(desired)) return
-      if (await input.isDisabled()) continue
-      await input.setChecked(Boolean(desired))
-      await expect(input).toBeChecked({ checked: Boolean(desired) })
-      return
+  const checked = async () => {
+    if (await toggle.evaluate((element) => element instanceof HTMLInputElement).catch(() => false)) {
+      return toggle.isChecked()
     }
-
-    const toggle = container.locator('[role="switch"], [aria-pressed]').first()
-    if (!(await toggle.count())) {
-      const fallback = page.getByRole('switch').last()
-      if (await fallback.count()) {
-        const checked = (await fallback.getAttribute('aria-checked')) === 'true'
-        if (checked !== Boolean(desired)) await fallback.click()
-        await expect.poll(async () => (await fallback.getAttribute('aria-checked')) === 'true')
-          .toBe(Boolean(desired))
-        return
-      }
-      continue
-    }
-    if (await toggle.isDisabled().catch(() => false)) continue
-    const checked = (await toggle.getAttribute('aria-checked')) === 'true' ||
+    return (await toggle.getAttribute('aria-checked')) === 'true' ||
       (await toggle.getAttribute('aria-pressed')) === 'true'
-    if (checked !== Boolean(desired)) await toggle.click()
-    await expect.poll(async () =>
-      (await toggle.getAttribute('aria-checked')) === 'true' ||
-      (await toggle.getAttribute('aria-pressed')) === 'true'
-    ).toBe(Boolean(desired))
-    return
   }
 
-  throw new Error(`Enabled switch not found near: ${text}`)
+  if ((await checked()) !== Boolean(desired)) {
+    const muiRoot = toggle.locator('xpath=ancestor::*[contains(@class, "MuiSwitch-root")][1]')
+    const clickTarget = await muiRoot.count() ? muiRoot : toggle
+    if (await clickTarget.isVisible().catch(() => false)) await clickTarget.click()
+    else await toggle.dispatchEvent('click')
+  }
+  await expect.poll(checked).toBe(Boolean(desired))
+}
+
+async function timeStepScope(page) {
+  const heading = page.getByRole('heading', { name: 'Выбор даты и времени' }).last()
+  await expect(heading).toBeVisible({ timeout: 30_000 })
+  const scope = heading.locator('xpath=ancestor::*[.//button[normalize-space(.)="Далее"]][1]')
+  return await scope.count() ? scope : page.locator('main').last()
 }
 
 async function chooseMonitoringDialogTime(page, kind, slotPosition = 'last') {
-  const dialog = page.getByRole('dialog').last()
-  const scope = await dialog.count() ? dialog : page.locator('main').last()
-  await scope.getByText(datePart(), { exact: true }).last().click()
+  const scope = await timeStepScope(page)
+  await scope.getByText(datePart(), { exact: true }).last().dispatchEvent('click')
 
   if (kind === 'asap') {
     await expect(scope.getByText('Запись как можно скорее', { exact: true })).toBeVisible({ timeout: 30_000 })
@@ -204,12 +189,12 @@ async function chooseMonitoringDialogTime(page, kind, slotPosition = 'last') {
     return 'asap'
   }
 
-  await setSwitchNearText(page, 'Запись как можно скорее', false)
   const slots = scope.getByText(/^\d{1,2}:\d{2}$/)
   const slot = slotPosition === 'second' ? slots.nth(1) : slotPosition === 'first' ? slots.first() : slots.last()
   await expect(slot).toBeVisible({ timeout: 30_000 })
   const selectedTime = (await slot.textContent())?.trim()
-  await slot.click({ timeout: 30_000 })
+  await slot.dispatchEvent('click')
+  await expect(scope.getByRole('button', { name: nextButton }).last()).toBeEnabled({ timeout: 30_000 })
   return selectedTime
 }
 
@@ -229,13 +214,13 @@ async function createAppointmentFromAppointments(page, scenario, person, offsetD
   await clickButton(page, nextButton)
 
   await expect(page.getByRole('heading', { name: 'Выбор даты и времени' })).toBeVisible({ timeout: 30_000 })
-  await page.getByText(datePart(offsetDays), { exact: true }).last().click()
-  const dialog = page.getByRole('dialog').last()
-  const scope = await dialog.count() ? dialog : page.locator('main').last()
+  const scope = await timeStepScope(page)
+  await scope.getByText(datePart(offsetDays), { exact: true }).last().dispatchEvent('click')
   const slot = scope.getByText(/^\d{1,2}:\d{2}$/).last()
   await expect(slot).toBeVisible({ timeout: 30_000 })
   const selectedTime = (await slot.textContent())?.trim()
-  await slot.click()
+  await slot.dispatchEvent('click')
+  await expect(scope.getByRole('button', { name: nextButton }).last()).toBeEnabled({ timeout: 30_000 })
   await clickButton(page, nextButton)
 
   await expect(page.getByRole('heading', { name: 'Ввод персональных данных' })).toBeVisible({ timeout: 30_000 })

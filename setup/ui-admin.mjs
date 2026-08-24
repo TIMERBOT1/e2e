@@ -531,9 +531,18 @@ export async function startUiCheckpoint(page, adminUrl, shopId, lineId, checkpoi
   await open(page, adminUrl, `/shops/${shopId}/lines/${lineId}/checkpoints/${checkpointId}/host`)
   await page.locator('[data-test="CheckpointHost-Action-start"]').click()
   await page.locator('[data-test="CheckpointHost-WorkScheduleMode-lineSchedule"]').click()
+  const servicesCard = page.locator('[data-test="CheckpointHost-ServicesCard"]')
   const allServices = page.locator('[data-test="CheckpointHost-AllServices"]')
-  if ((await allServices.textContent()).trim() === 'Выбрать все') await allServices.click()
-  await expect(page.locator('[data-test="CheckpointHost-AllServices"]')).not.toHaveText(/Выбрать все/)
+  const serviceSwitches = servicesCard.getByRole('switch')
+  await expect(allServices).toBeVisible()
+  await expect(serviceSwitches.first()).toBeAttached()
+  const servicesSelected = await serviceSwitches.evaluateAll((switches) =>
+    switches.every((item) => item instanceof HTMLInputElement && item.checked)
+  )
+  if (!servicesSelected) await allServices.click()
+  await expect.poll(async () => serviceSwitches.evaluateAll((switches) =>
+    switches.length > 0 && switches.every((item) => item instanceof HTMLInputElement && item.checked)
+  )).toBe(true)
   await expect(page.locator('[data-test="CheckpointHost-ApplyButton"]')).toBeEnabled()
   const hostPath = `/checkpoints/${checkpointId}/host`
   const [response] = await Promise.all([

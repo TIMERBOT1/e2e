@@ -74,11 +74,9 @@ export async function createFutureAppointmentFromTerminal(page, scenario, phone,
   await expect(page.locator('[data-test="confirmation-date"]')).toContainText(slotText)
 
   const appointmentResponse = page.waitForResponse((response) => response.url().includes('/terminal/createAppointment'))
-  const successShown = page
-    .locator('[data-test="success-join"]')
-    .waitFor({ state: 'visible', timeout: expectFinalScreen ? 15_000 : 3_000 })
-    .then(() => true)
-    .catch(() => false)
+  const completed = expectFinalScreen
+    ? page.locator('[data-test="success-join"]').waitFor({ state: 'visible', timeout: 15_000 })
+    : page.locator('[data-test="intro"]').waitFor({ state: 'visible', timeout: 15_000 })
 
   await page.locator('[data-test="btn-confirm-appointment"]').click({ force: true })
 
@@ -88,11 +86,11 @@ export async function createFutureAppointmentFromTerminal(page, scenario, phone,
 
   expect(appointment.ok(), JSON.stringify(body)).toBe(true)
   expect(Number.isFinite(appointmentId) && appointmentId > 0, JSON.stringify(body)).toBe(true)
-  await page.waitForTimeout(2_000)
+  await completed
 
   return {
     appointmentId,
     token: String(body.recap || '').match(/Номер брони:\s*(\S+)/)?.[1],
-    successShown: await successShown
+    successShown: expectFinalScreen
   }
 }

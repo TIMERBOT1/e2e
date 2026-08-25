@@ -8,10 +8,14 @@ const here = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(here, '..')
 export const permissionsStatePath = resolve(rootDir, '.e2e-permissions-state.json')
 const password = process.env.E2E_PERMISSION_USER_PASSWORD || 'E2ePermission1!'
+const userProfiles = {
+  admin: ['Администратор', 'Administrator'],
+  operator: ['Оператор', 'Line Operator']
+}
 
 const permissionSets = {
   full: {
-    profile: 'Администратор',
+    profile: userProfiles.admin,
     permissions: [
       'canAccessPlaceLineMonitoring',
       'manageAppointments',
@@ -54,29 +58,29 @@ const permissionSets = {
     }
   },
   restricted: {
-    profile: 'Оператор',
+    profile: userProfiles.operator,
     permissions: ['canViewShop', 'canViewLine'],
     values: {
       viewPositions: 'Все'
     }
   },
   noAccess: {
-    profile: 'Оператор',
+    profile: userProfiles.operator,
     permissions: []
   },
   manageUsers: {
-    profile: 'Администратор',
+    profile: userProfiles.admin,
     permissions: ['canManageUserAccounts', 'canViewShop', 'canViewLine']
   },
   reduced: {
-    profile: 'Оператор',
+    profile: userProfiles.operator,
     permissions: ['canViewShop', 'canViewLine', 'canAccessPlaceLineMonitoring', 'canCloseCheckpoints'],
     values: {
       viewPositions: 'Все'
     }
   },
   suggested: {
-    profile: 'Оператор',
+    profile: userProfiles.operator,
     permissions: ['canViewShop', 'canViewLine', 'canAccessPlaceLineMonitoring'],
     values: {
       viewPositions: 'Только предлагаемые'
@@ -198,16 +202,35 @@ function isApiPath(response, path, methods = ['GET']) {
 }
 
 async function selectDropdown(page, label, optionName) {
+  const optionNames = Array.isArray(optionName) ? optionName : [optionName]
+  const optionPattern = new RegExp(`^\\s*(?:${optionNames.map(escapeRe).join('|')})\\s*$`)
+
   await poll(async () => {
-    const control = page.locator('.MuiFormControl-root').filter({ hasText: label }).first()
-    const combobox = control.getByRole('combobox').first()
+    const labelledCombobox = page.getByRole('combobox', { name: label, exact: true }).first()
+    const fallbackControl = page.locator('.MuiFormControl-root').filter({ hasText: label }).first()
+    const combobox = (await labelledCombobox.isVisible().catch(() => false))
+      ? labelledCombobox
+      : fallbackControl.getByRole('combobox').first()
     if (!(await combobox.isVisible().catch(() => false))) return false
+
+    const selectedText = (await combobox.textContent().catch(() => ''))
+      .replace(/[\u200B\uFEFF]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+    if (optionNames.includes(selectedText)) return true
+
+    await page.keyboard.press('Escape').catch(() => {})
     await combobox.click()
-    const option = page.getByRole('option', { name: new RegExp(escapeRe(optionName)) }).first()
+    const option = page.getByRole('option', { name: optionPattern }).first()
     if (!(await option.isVisible({ timeout: 1_000 }).catch(() => false))) return false
     await option.click()
-    return true
-  }, `dropdown ${label}`, 30_000)
+
+    const updatedText = (await combobox.textContent().catch(() => ''))
+      .replace(/[\u200B\uFEFF]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+    return optionNames.includes(updatedText)
+  }, `dropdown ${label} (${optionNames.join(' / ')})`, 30_000)
 }
 
 async function reveal(page, title, marker) {
@@ -285,7 +308,7 @@ async function hasPermissionLabel(page, label) {
 export async function validatePermissionControls(page, adminUrl) {
   await open(page, adminUrl, '/users/create')
   await reveal(page, 'Права и доступ', 'Активен')
-  await selectDropdown(page, 'Тип пользователя', 'Администратор')
+  await selectDropdown(page, 'Тип пользователя', userProfiles.admin)
   await revealPermissionAccordions(page)
   await setAdminToggle(page, permissionLabels.manageJournal, true)
   await setAdminToggle(page, permissionLabels.canAddAndEditPositions, true)
@@ -358,7 +381,12 @@ export async function createPermissionUsers(page, adminUrl, stand = readRequired
   savePermissionsState(state)
 
   for (const key of ['full', 'restricted', 'noAccess', 'manageUsers', 'reduced', 'suggested']) {
-    state.users[key] = await createPermissionUser(page, adminUrl, stand, key)
+    try {
+      state.users[key] = await createPermissionUser(page, adminUrl, stand, key)
+    } catch (error) {
+      error.message = `Failed to prepare permission set ${key}: ${error.message}`
+      throw error
+    }
     savePermissionsState(state)
   }
 

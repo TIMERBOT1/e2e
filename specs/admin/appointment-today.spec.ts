@@ -22,7 +22,7 @@ type StandScenario = {
 
 type StandState = {
   runId: string
-  currentUser?: { firstName?: string; lastName?: string; email?: string }
+  technicalBreakOperator?: { firstName: string; lastName: string; email: string }
   scenarios: Record<string, StandScenario>
 }
 
@@ -82,15 +82,14 @@ test('TC-1 creates a timed appointment for today from line monitoring', async ({
 test('TC-5 creates a timed technical service break for today from line monitoring', async ({ page }) => {
   const state = readState()
   const scenario = timedScenario()
-  const operatorSearchTerm =
-    state.currentUser?.lastName || state.currentUser?.firstName || state.currentUser?.email || process.env.ADMIN_LOGIN
-  expect(operatorSearchTerm, 'Current operator search term is missing from stand state').toBeTruthy()
+  const operator = state.technicalBreakOperator
+  expect(operator, 'Technical break operator is missing; run pnpm stand:prepare again').toBeTruthy()
   expect(scenario.technicalServiceName, 'Technical service is missing; run pnpm stand:prepare again').toBeTruthy()
   let positionId: number | undefined
 
   await loginAdmin(page)
   try {
-    const result = await createTechnicalBreak(page, scenario, operatorSearchTerm!)
+    const result = await createTechnicalBreak(page, scenario, operator!.lastName)
     positionId = result.positionId
     await expectCreatedMonitoringPosition(page, scenario, positionId, {
       serviceName: scenario.technicalServiceName!,

@@ -64,6 +64,13 @@ const permissionSets = {
       viewPositions: 'Все'
     }
   },
+  standOperator: {
+    profile: userProfiles.operator,
+    permissions: ['canViewShop', 'canViewLine'],
+    values: {
+      viewPositions: 'Все'
+    }
+  },
   noAccess: {
     profile: userProfiles.operator,
     permissions: []
@@ -189,7 +196,18 @@ export function readRequiredStandState() {
 }
 
 function emailFor(runId, key) {
-  return `perm-${key}-${runId.replace(/[^a-z0-9]/gi, '').slice(-12).toLowerCase()}@example.com`
+  const emailKey = key === 'standOperator' ? 'operator' : key
+  return `perm-${emailKey}-${runId.replace(/[^a-z0-9]/gi, '').slice(-12).toLowerCase()}@example.com`
+}
+
+function identityFor(runId, key) {
+  if (key !== 'standOperator') return { firstName: `E2E ${key}`, lastName: 'Permissions' }
+
+  const suffix = runId
+    .replace(/[^a-z0-9]/gi, '')
+    .slice(-10)
+    .replace(/\d/g, (digit) => String.fromCharCode('A'.charCodeAt(0) + Number(digit)))
+  return { firstName: 'E2E', lastName: `Operator${suffix}` }
 }
 
 async function findUser(page, adminUrl, email) {
@@ -330,13 +348,15 @@ export async function validatePermissionControls(page, adminUrl) {
 
 export async function createPermissionUser(page, adminUrl, stand, key) {
   const set = permissionSets[key]
+  if (!set) throw new Error(`Unknown permission user set: ${key}`)
   const email = emailFor(stand.runId, key)
+  const identity = identityFor(stand.runId, key)
   const stale = await findUser(page, adminUrl, email)
   if (stale) await deletePermissionUser(page, adminUrl, { id: stale.id, email })
 
   await open(page, adminUrl, '/users/create')
-  await fillAdminText(page, 'Имя', `E2E ${key}`)
-  await fillAdminText(page, 'Фамилия', 'Permissions')
+  await fillAdminText(page, 'Имя', identity.firstName)
+  await fillAdminText(page, 'Фамилия', identity.lastName)
   await fillAdminText(page, 'Адрес электронной почты', email)
   await fillAdminText(page, 'Описание', `E2E permissions ${stand.runId} ${key}`)
   await fillAdminText(page, 'Пароль', password)
@@ -348,6 +368,8 @@ export async function createPermissionUser(page, adminUrl, stand, key) {
   const user = await poll(() => findUser(page, adminUrl, email), `created permission user ${email}`, 30_000)
   return {
     id: Number(user.id),
+    firstName: identity.firstName,
+    lastName: identity.lastName,
     email,
     password,
     permissionSet: key,

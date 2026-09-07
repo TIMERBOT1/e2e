@@ -1,4 +1,5 @@
 import { api, getJson, poll, unwrapList } from './shared.mjs'
+import { deletePermissionUser } from './permissions-ui.mjs'
 import { jsonOrEmpty, open } from './ui-admin.mjs'
 
 const removeButton = /^Удалить$/i
@@ -448,6 +449,15 @@ export async function cleanupUiStand(page, adminUrl, state) {
   } catch (error) {
     if (!cleanupError) cleanupError = error
     else console.error(`[stand:cleanup:tag:error] ${error.message}`)
+  }
+
+  try {
+    if (state.technicalBreakOperator?.email) {
+      await deletePermissionUser(page, adminUrl, state.technicalBreakOperator)
+    }
+  } catch (error) {
+    if (!cleanupError) cleanupError = error
+    else console.error(`[stand:cleanup:operator:error] ${error.message}`)
   }
 
   try {

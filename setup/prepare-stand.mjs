@@ -9,6 +9,7 @@ import {
 } from './shared.mjs'
 import { createTomorrowAppointment } from './admin-line-monitoring.mjs'
 import { findAppointmentToken } from './cleanup-ui.mjs'
+import { createPermissionUser } from './permissions-ui.mjs'
 import {
   cleanupPreparedState,
   createUiCheckpoint,
@@ -590,6 +591,15 @@ async function main() {
     await createSmokeLineTemplate(page, adminUrl, state)
     const shop = await createUiShop(page, adminUrl, runId)
     state.place = { id: Number(shop.id), name: shop.name }
+    saveState(state)
+
+    const operator = await createPermissionUser(page, adminUrl, state, 'standOperator')
+    state.technicalBreakOperator = {
+      id: operator.id,
+      firstName: operator.firstName,
+      lastName: operator.lastName,
+      email: operator.email
+    }
     saveState(state)
 
     if (process.env.E2E_SKIP_BEACON !== '1') {

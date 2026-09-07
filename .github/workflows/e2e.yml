@@ -21,6 +21,9 @@ jobs:
       ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       CALL_TERMINAL_BASE_URL: ${{ secrets.CALL_TERMINAL_BASE_URL }}
+      TZ: Asia/Yekaterinburg
+      E2E_TIMEZONE: Asia/Yekaterinburg
+      E2E_LOCALE: ru-RU
       CI: true
       PLAYWRIGHT_HTML_OPEN: never
 

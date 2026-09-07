@@ -16,6 +16,8 @@ if (existsSync(envFile)) {
 }
 
 const standSlowMoMs = Number(process.env.STAND_SLOW_MO_MS || 0) || undefined
+const e2eTimezone = process.env.E2E_TIMEZONE || 'Asia/Yekaterinburg'
+const e2eLocale = process.env.E2E_LOCALE || 'ru-RU'
 
 export default defineConfig({
   testDir: './specs',
@@ -28,6 +30,8 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: process.env.CALL_TERMINAL_BASE_URL || process.env.TERMINAL_URL || 'https://call.vseupalo.ru/terminal/',
+    locale: e2eLocale,
+    timezoneId: e2eTimezone,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: process.env.STAND_VIDEO || 'retain-on-failure',

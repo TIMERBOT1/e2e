@@ -557,7 +557,7 @@ async function readSmokeFixtures(page, adminUrl, state) {
   state.currentUser = {
     id: itemId(user),
     firstName: user.firstName,
-    lastName: user.lastName,
+    lastName: user.secondName ?? user.lastName,
     email: user.email
   }
 }

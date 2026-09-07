@@ -420,7 +420,7 @@ async function selectOperator(page, searchTerm) {
   const input = page.getByRole('combobox', { name: 'Поиск сотрудника', exact: false }).last()
   await expect(input).toBeVisible({ timeout: 30_000 })
   await input.fill(searchTerm)
-  const option = page.getByRole('option').first()
+  const option = page.getByRole('option').filter({ hasText: searchTerm }).first()
   await expect(option).toBeVisible({ timeout: 30_000 })
   const operatorName = (await option.textContent())?.replace(/\s+/g, ' ').trim()
   await option.click()

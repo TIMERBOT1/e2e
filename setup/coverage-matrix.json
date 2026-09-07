@@ -110,7 +110,7 @@
       "brandId": "$brand.id"
     },
     "assert": {
-      "selector": "form input[type=\"number\"]"
+      "text": "Укажите фильтры"
     }
   },
   {

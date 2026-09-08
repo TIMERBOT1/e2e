@@ -1,4 +1,5 @@
-import { BrowserContext, expect, Page, test } from '@playwright/test'
+import type { BrowserContext, Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,7 +28,7 @@ const adminLogin = process.env.ADMIN_LOGIN
 const adminPassword = process.env.ADMIN_PASSWORD
 
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBe(true)
+  expect(existsSync(statePath), `Use pnpm e2e:test. Missing ${statePath}`).toBe(true)
   return JSON.parse(readFileSync(statePath, 'utf8'))
 }
 
@@ -93,8 +94,6 @@ async function cleanupAppointmentsByIds(
     await adminPage.close()
   }
 }
-
-test.describe.configure({ mode: 'serial' })
 
 test('timed today creates booking and removes it from monitoring', async ({ page, context }) => {
   const scenario = getScenario('timed')

@@ -16,13 +16,14 @@ function runPnpm(args) {
 }
 
 async function main() {
+  process.env.E2E_STAND_PROFILE = 'smoke'
   const prepareCode = await run('node', ['setup/prepare-stand.mjs'])
   if (prepareCode !== 0) {
     const cleanupCode = await run('node', ['setup/cleanup-stand.mjs'])
     process.exit(prepareCode || cleanupCode)
   }
 
-  const testCode = await runPnpm(['test'])
+  const testCode = await runPnpm(['exec', 'playwright', 'test', 'specs/admin/coverage-smoke.spec.ts'])
   const cleanupCode = await run('node', ['setup/cleanup-stand.mjs'])
 
   process.exit(testCode || cleanupCode)

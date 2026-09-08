@@ -1,4 +1,5 @@
-import { expect, Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { loginAdmin } from '../../setup/admin-line-monitoring.mjs'
 import { getJson, loadEnv, readState, requiredEnv, unwrapList } from '../../setup/shared.mjs'
 import { open, responseHas, startUiCheckpoint } from '../../setup/ui-admin.mjs'

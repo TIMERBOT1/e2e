@@ -27,7 +27,9 @@ export function loadEnv() {
 
 export function readState() {
   if (!existsSync(statePath)) {
-    throw new Error(`Stand state not found: ${statePath}. Run pnpm stand:prepare first.`)
+    throw new Error(
+      `Stand state not found: ${statePath}. Use pnpm e2e:test, pnpm smoke:cycle, or pnpm permissions:cycle.`
+    )
   }
 
   return JSON.parse(readFileSync(statePath, 'utf8'))

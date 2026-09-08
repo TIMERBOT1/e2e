@@ -1,4 +1,5 @@
-import { expect, Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -46,7 +47,7 @@ const rootDir = fileURLToPath(new URL('../..', import.meta.url))
 const statePath = resolve(rootDir, '.e2e-stand-state.json')
 
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBeTruthy()
+  expect(existsSync(statePath), `Use pnpm e2e:test. Missing ${statePath}`).toBeTruthy()
   return JSON.parse(readFileSync(statePath, 'utf8'))
 }
 
@@ -108,7 +109,6 @@ async function createFindAndRemoveTomorrowAppointment(page: Page) {
   await removeAppointmentToken(page, adminUrl!, scenario, person.email, true)
 }
 
-test.describe.configure({ mode: 'serial' })
 test.setTimeout(120_000)
 
 test('line monitoring creates asap position and completes service', async ({ page }) => {
@@ -124,6 +124,9 @@ test('line monitoring creates tomorrow appointment and removes it from appointme
 })
 
 test('position journal shows completed line monitoring positions with details', async ({ page }) => {
+  await createCompleteAndRecord(page, 'asap', 'asap')
+  await createCompleteAndRecord(page, 'timed', 'timed')
+
   const records = (readState().monitoringJournal || []).filter((item) => ['asap', 'timed'].includes(item.kind))
   expect(records.map((item) => item.kind).sort()).toEqual(['asap', 'timed'])
 

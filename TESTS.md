@@ -2,7 +2,7 @@
 
 Документ описывает все тесты, которые Playwright обнаруживает в каталоге `specs`.
 
-Последняя сверка с `pnpm exec playwright test --list`: **17 августа 2026 года**.
+Последняя сверка и полный прогон: **8 сентября 2026 года**.
 
 Всего реализовано **178 тестов в 11 spec-файлах**:
 
@@ -351,46 +351,66 @@ Smoke-тесты проверяют, что основные страницы о
 
 ## 5. Запуск групп
 
-Полный цикл с созданием стенда, всеми тестами и очисткой:
+Полный последовательный запуск всех групп:
 
 ```bash
 pnpm full:cycle
 ```
 
-Административные и терминальные тесты на уже подготовленном стенде:
+Команда запускает три независимые группы: functional E2E, route-smoke и permissions. Падение одной группы не отменяет запуск следующих групп. Каждый functional E2E-тест создаёт и удаляет собственные данные; route-smoke и permissions используют отдельные групповые стенды.
+
+Все функциональные E2E-тесты административной панели и терминала:
+
+```bash
+pnpm e2e:test
+```
+
+Короткий алиас этой же команды:
 
 ```bash
 pnpm test
 ```
 
-Только smoke-тесты административных маршрутов:
+Обе команды запускают functional E2E без внешнего prepare/cleanup. Автоматическая Playwright-фикстура перед каждым отдельным тестом создаёт только нужные ему сущности, а после теста независимо удаляет их. Предварительно запускать `pnpm stand:prepare` не нужно.
+
+Один тест можно запустить этой же командой, передав spec-файл и `--grep`:
 
 ```bash
-pnpm exec playwright test specs/admin/coverage-smoke.spec.ts
+pnpm e2e:test -- specs/admin/appointment-today.spec.ts --grep "TC-5"
+```
+
+Функциональные E2E с записью видео:
+
+```bash
+pnpm test:video
+```
+
+Полный цикл smoke-тестов административных маршрутов:
+
+```bash
+pnpm smoke:cycle
 ```
 
 Только функциональные тесты административной панели:
 
-```bash
-pnpm exec playwright test specs/admin/appointment-today.spec.ts specs/admin/future-appointment-creation.spec.ts specs/admin/line-monitoring.spec.ts specs/admin/settings.spec.ts specs/admin/checkpoint-list.spec.ts specs/admin/checkpoint-cases.spec.ts specs/admin/staff-management-cases.spec.ts
-```
+Они входят в `pnpm e2e:test`; для выборочного запуска передайте нужные spec-файлы после `--`.
 
 Только кейсы Kiwi TCMS по созданию записи на сегодня:
 
 ```bash
-pnpm exec playwright test specs/admin/appointment-today.spec.ts
+pnpm e2e:test -- specs/admin/appointment-today.spec.ts
 ```
 
 Только кейсы Kiwi TCMS по созданию предварительной записи:
 
 ```bash
-pnpm exec playwright test specs/admin/future-appointment-creation.spec.ts
+pnpm e2e:test -- specs/admin/future-appointment-creation.spec.ts
 ```
 
 Только кейсы Kiwi TCMS для точек обслуживания:
 
 ```bash
-pnpm exec playwright test specs/admin/checkpoint-cases.spec.ts
+pnpm e2e:test -- specs/admin/checkpoint-cases.spec.ts
 ```
 
 Полный цикл permission-тестов с подготовкой и очисткой:
@@ -414,5 +434,5 @@ pnpm exec playwright test specs/permissions/permissions-feature.spec.ts
 Только тесты терминала:
 
 ```bash
-pnpm exec playwright test specs/terminal/booking.spec.ts
+pnpm e2e:test -- specs/terminal/booking.spec.ts
 ```

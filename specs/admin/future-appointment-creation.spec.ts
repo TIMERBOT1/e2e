@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,7 +28,7 @@ const rootDir = fileURLToPath(new URL('../..', import.meta.url))
 const statePath = resolve(rootDir, '.e2e-stand-state.json')
 
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBeTruthy()
+  expect(existsSync(statePath), `Use pnpm e2e:test. Missing ${statePath}`).toBeTruthy()
   return JSON.parse(readFileSync(statePath, 'utf8'))
 }
 

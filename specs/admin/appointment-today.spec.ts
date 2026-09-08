@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -30,7 +30,7 @@ const rootDir = fileURLToPath(new URL('../..', import.meta.url))
 const statePath = resolve(rootDir, '.e2e-stand-state.json')
 
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBeTruthy()
+  expect(existsSync(statePath), `Use pnpm e2e:test. Missing ${statePath}`).toBeTruthy()
   return JSON.parse(readFileSync(statePath, 'utf8'))
 }
 
@@ -83,8 +83,8 @@ test('TC-5 creates a timed technical service break for today from line monitorin
   const state = readState()
   const scenario = timedScenario()
   const operator = state.technicalBreakOperator
-  expect(operator, 'Technical break operator is missing; run pnpm stand:prepare again').toBeTruthy()
-  expect(scenario.technicalServiceName, 'Technical service is missing; run pnpm stand:prepare again').toBeTruthy()
+  expect(operator, 'Technical break operator is missing from the functional E2E fixture').toBeTruthy()
+  expect(scenario.technicalServiceName, 'Technical service is missing from the functional E2E fixture').toBeTruthy()
   let positionId: number | undefined
 
   await loginAdmin(page)

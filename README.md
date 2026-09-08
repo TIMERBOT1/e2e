@@ -52,9 +52,9 @@ pnpm test:video
 ## CI
 
 Workflow `.github/workflows/e2e.yml` запускается вручную или по расписанию.
-Functional E2E распределяются по двум независимым CI shard. После завершения
-обоих shard, независимо от результата, параллельно запускаются job route-smoke
-и permissions.
+Functional E2E выполняются последовательно одним worker в одной CI job без
+shard. После её завершения, независимо от результата, параллельно запускаются
+job route-smoke и permissions.
 Добавьте в Secrets репозитория `ADMIN_URL`, `ADMIN_LOGIN`,
 `ADMIN_PASSWORD` и `CALL_TERMINAL_BASE_URL`. Отчёт Playwright, screenshots,
 traces и videos сохраняются как артефакты каждого запуска.

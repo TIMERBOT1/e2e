@@ -1,9 +1,7 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '../../setup/e2e-test-fixture'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { findAppointmentToken, removeAppointmentToken } from '../../setup/cleanup-ui.mjs'
+import { readState as readFixtureState, saveState as saveFixtureState } from '../../setup/shared.mjs'
 import {
   completeLineMonitoringPosition,
   createLineMonitoringPosition,
@@ -43,21 +41,17 @@ type StandState = {
   monitoringJournal?: MonitoringJournalRecord[]
 }
 
-const rootDir = fileURLToPath(new URL('../..', import.meta.url))
-const statePath = resolve(rootDir, '.e2e-stand-state.json')
-
 function readState(): StandState {
-  expect(existsSync(statePath), `Use pnpm e2e:test. Missing ${statePath}`).toBeTruthy()
-  return JSON.parse(readFileSync(statePath, 'utf8'))
+  return readFixtureState() as StandState
 }
 
 function saveState(state: StandState) {
-  writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`)
+  saveFixtureState(state)
 }
 
 function getScenario(key: string): StandScenario {
   const scenario = readState().scenarios[key]
-  expect(scenario, `Scenario ${key} is missing in ${statePath}`).toBeTruthy()
+  expect(scenario, `Scenario ${key} is missing from the test fixture`).toBeTruthy()
   return scenario
 }
 

@@ -4,9 +4,11 @@ import {
   loginAdmin,
   poll,
   saveState,
+  setActiveState,
   terminalUrl,
   unwrapList
 } from './shared.mjs'
+import { fileURLToPath } from 'node:url'
 import { createTomorrowAppointment } from './admin-line-monitoring.mjs'
 import { findAppointmentToken } from './cleanup-ui.mjs'
 import { createPermissionUser } from './permissions-ui.mjs'
@@ -20,21 +22,8 @@ import {
   startUiCheckpoint
 } from './ui-admin.mjs'
 
-const runId = `e2e-${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}-${Math.random()
-  .toString(36)
-  .slice(2, 6)}`
 const noSlotsTimeSlotSeconds = 60
-const standProfile = process.env.E2E_STAND_PROFILE || 'smoke'
 const supportedStandProfiles = new Set(['e2e', 'smoke', 'permissions'])
-const requestedScenarios = process.env.E2E_SCENARIOS
-const selectedE2EScenarios =
-  standProfile === 'e2e' && requestedScenarios !== undefined
-    ? new Set(requestedScenarios.split(',').map((key) => key.trim()).filter((key) => key && key !== 'none'))
-    : null
-
-function wantsScenario(key) {
-  return selectedE2EScenarios === null || selectedE2EScenarios.has(key)
-}
 
 function first(items, label) {
   const item = items.find(Boolean)
@@ -430,7 +419,6 @@ async function createTimedPosition(context, scenario) {
     const mode = await poll(async () => {
       if (await booking.isVisible().catch(() => false)) return 'booking'
       if (await timeslot.isVisible().catch(() => false)) return 'timeslot'
-      if (await page.locator('[data-test="notification-screen"]').isVisible().catch(() => false)) return 'asap'
       return false
     }, 'noSlots terminal booking step', 60_000).catch(async () => {
       const body = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300)
@@ -442,8 +430,6 @@ async function createTimedPosition(context, scenario) {
       needsSlot = true
     } else if (mode === 'timeslot') {
       needsSlot = true
-    } else {
-      throw new Error('noSlots reservation failed: timed booking option not visible')
     }
 
     if (needsSlot) {
@@ -589,7 +575,21 @@ async function createSmokeAppointment(page, adminUrl, state) {
   state.appointment = { id, token, shopId: scenario.shopId, lineId: scenario.lineId, scenarioKey: scenario.key }
 }
 
-async function main() {
+export async function prepareStand(options = {}) {
+  const standProfile = options.profile || process.env.E2E_STAND_PROFILE || 'smoke'
+  const requestedScenarios = options.scenarios ?? process.env.E2E_SCENARIOS
+  const scenarioKeys = Array.isArray(requestedScenarios)
+    ? requestedScenarios
+    : requestedScenarios?.split(',')
+  const selectedE2EScenarios =
+    standProfile === 'e2e' && scenarioKeys !== undefined
+      ? new Set(scenarioKeys.map((key) => key.trim()).filter((key) => key && key !== 'none'))
+      : null
+  const wantsScenario = (key) => selectedE2EScenarios === null || selectedE2EScenarios.has(key)
+  const runId = `e2e-${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`
+
   if (!supportedStandProfiles.has(standProfile)) {
     throw new Error(`Unknown E2E_STAND_PROFILE: ${standProfile}`)
   }
@@ -597,7 +597,9 @@ async function main() {
   const isE2E = standProfile === 'e2e'
   const isSmoke = standProfile === 'smoke'
   const isPermissions = standProfile === 'permissions'
-  const { browser, context, page, adminUrl } = await loginAdmin()
+  const ownsSession = !options.session
+  const session = options.session || await loginAdmin()
+  const { browser, context, page, adminUrl } = session
   const state = {
     runId,
     profile: standProfile,
@@ -605,6 +607,7 @@ async function main() {
     place: null,
     scenarios: {}
   }
+  if (options.stateMode === 'memory') setActiveState(state)
 
   try {
     if (isSmoke || isPermissions) await createSmokeLineTemplate(page, adminUrl, state)
@@ -612,7 +615,7 @@ async function main() {
     state.place = { id: Number(shop.id), name: shop.name }
     saveState(state)
 
-    if (isE2E && process.env.E2E_CREATE_OPERATOR === '1') {
+    if (isE2E && (options.createOperator ?? process.env.E2E_CREATE_OPERATOR === '1')) {
       const operator = await createPermissionUser(page, adminUrl, state, 'standOperator')
       state.technicalBreakOperator = {
         id: operator.id,
@@ -766,15 +769,27 @@ async function main() {
 
     console.log(`[stand:prepare] created ${runId} (${standProfile})`)
     console.log(`[stand:prepare] state ${state.place.id} -> ${Object.keys(state.scenarios).join(', ')}`)
+    return state
   } catch (error) {
     saveState(state)
     console.error(`[stand:prepare:error] ${error.stack || error.message}`)
     await cleanupPreparedState(page, adminUrl, state)
-    process.exitCode = 1
+    throw error
   } finally {
-    await context.close().catch(() => {})
-    await browser.close()
+    if (ownsSession) {
+      await context.close().catch(() => {})
+      if (session.ownsBrowser !== false) await browser.close()
+    }
   }
 }
 
-main()
+async function main() {
+  await prepareStand()
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((error) => {
+    console.error(`[stand:prepare:error] ${error.stack || error.message}`)
+    process.exitCode = 1
+  })
+}

@@ -23,6 +23,12 @@ pnpm full:cycle
 `smoke:cycle` и `permissions:cycle` управляют отдельными стендами своих групп,
 а `full:cycle` последовательно запускает все три независимые группы.
 
+Functional E2E по умолчанию выполняются двумя Playwright worker. Подготовка и
+очистка используют общую авторизованную сессию внутри каждого worker, но данные
+и состояние создаются отдельно для каждого теста. Число worker можно изменить
+через `E2E_WORKERS`; для диагностического последовательного прогона в
+PowerShell используйте `$env:E2E_WORKERS = '1'`.
+
 Полный сгруппированный список сценариев: [TESTS.md](./TESTS.md).
 
 ```bash
@@ -46,8 +52,9 @@ pnpm test:video
 ## CI
 
 Workflow `.github/workflows/e2e.yml` запускается вручную или по расписанию.
-Сначала выполняется отдельная job functional E2E. После неё, независимо от
-результата, параллельно запускаются job route-smoke и permissions.
+Functional E2E распределяются по двум независимым CI shard. После завершения
+обоих shard, независимо от результата, параллельно запускаются job route-smoke
+и permissions.
 Добавьте в Secrets репозитория `ADMIN_URL`, `ADMIN_LOGIN`,
 `ADMIN_PASSWORD` и `CALL_TERMINAL_BASE_URL`. Отчёт Playwright, screenshots,
 traces и videos сохраняются как артефакты каждого запуска.

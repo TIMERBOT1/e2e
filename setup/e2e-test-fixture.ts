@@ -1,15 +1,33 @@
-import { expect, test as base, type TestInfo } from '@playwright/test'
-import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const standStatePath = resolve(rootDir, '.e2e-stand-state.json')
+import {
+  expect,
+  test as base,
+  type Browser,
+  type BrowserContext,
+  type Page,
+  type TestInfo
+} from '@playwright/test'
+import { cleanupStand } from './cleanup-stand.mjs'
+import { prepareStand } from './prepare-stand.mjs'
+import { clearActiveState, loginAdmin } from './shared.mjs'
 
 type FixturePlan = {
   scenarios: string[]
   operator?: boolean
+}
+
+type StandState = {
+  runId: string
+  profile: string
+  place: { id: number; name: string } | null
+  scenarios: Record<string, unknown>
+}
+
+type AdminSession = {
+  browser: Browser
+  context: BrowserContext
+  page: Page
+  adminUrl: string
+  ownsBrowser: boolean
 }
 
 function planFor(testInfo: TestInfo): FixturePlan {
@@ -52,34 +70,56 @@ function planFor(testInfo: TestInfo): FixturePlan {
   throw new Error(`E2E fixture plan is not defined for ${file}: ${title}`)
 }
 
-function runNode(script: string, env: NodeJS.ProcessEnv) {
-  return new Promise<void>((resolvePromise, reject) => {
-    const child = spawn(process.execPath, [script], { cwd: rootDir, env, stdio: 'inherit' })
-    child.on('error', reject)
-    child.on('exit', (code) => {
-      if (code === 0) resolvePromise()
-      else reject(new Error(`${script} exited with code ${code ?? 1}`))
-    })
-  })
-}
-
-export const test = base.extend<{ e2eEntities: void }>({
-  e2eEntities: [
-    async ({}, use, testInfo) => {
-      const plan = planFor(testInfo)
-      const env = {
-        ...process.env,
-        E2E_STAND_PROFILE: 'e2e',
-        E2E_SCENARIOS: plan.scenarios.length ? plan.scenarios.join(',') : 'none',
-        E2E_CREATE_OPERATOR: plan.operator ? '1' : '0'
-      }
-
-      if (existsSync(standStatePath)) await runNode('setup/cleanup-stand.mjs', env)
+export const test = base.extend<
+  { e2eEntities: StandState },
+  { e2eAdminSession: AdminSession }
+>({
+  e2eAdminSession: [
+    async ({ browser }, use) => {
+      const session = await loginAdmin(browser) as AdminSession
       try {
-        await runNode('setup/prepare-stand.mjs', env)
-        await use()
+        await use(session)
       } finally {
-        await runNode('setup/cleanup-stand.mjs', env)
+        await session.context.close().catch(() => {})
+      }
+    },
+    { scope: 'worker', timeout: 120_000 }
+  ],
+
+  e2eEntities: [
+    async ({ e2eAdminSession }, use, testInfo) => {
+      const plan = planFor(testInfo)
+      let state: StandState | undefined
+      const preparePage = await e2eAdminSession.context.newPage()
+      const prepareSession = { ...e2eAdminSession, page: preparePage }
+
+      clearActiveState()
+      try {
+        state = await prepareStand({
+          session: prepareSession,
+          profile: 'e2e',
+          scenarios: plan.scenarios,
+          createOperator: Boolean(plan.operator),
+          stateMode: 'memory'
+        }) as StandState
+        await preparePage.close()
+        await use(state)
+      } finally {
+        if (state) {
+          const cleanupPage = await e2eAdminSession.context.newPage()
+          try {
+            await cleanupStand({
+              session: { ...e2eAdminSession, page: cleanupPage },
+              state,
+              stateMode: 'memory'
+            })
+          } finally {
+            await cleanupPage.close().catch(() => {})
+          }
+        } else {
+          clearActiveState()
+        }
+        await preparePage.close().catch(() => {})
       }
     },
     { auto: true, timeout: 300_000 }

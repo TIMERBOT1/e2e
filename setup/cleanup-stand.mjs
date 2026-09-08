@@ -1,33 +1,41 @@
 import { cleanupUiStand } from './cleanup-ui.mjs'
-import { loginAdmin, readState, removeState } from './shared.mjs'
+import { clearActiveState, loginAdmin, readState, removeState } from './shared.mjs'
+import { fileURLToPath } from 'node:url'
 
-async function main() {
-  if (process.env.KEEP_E2E_STAND === '1') {
+export async function cleanupStand(options = {}) {
+  if ((options.keep ?? process.env.KEEP_E2E_STAND === '1')) {
     console.log('[stand:cleanup] skipped because KEEP_E2E_STAND=1')
     return
   }
 
-  let state
+  let state = options.state
   try {
-    state = readState()
+    state ||= readState()
   } catch (error) {
     console.log(`[stand:cleanup] ${error.message}`)
     return
   }
 
-  const { browser, context, page, adminUrl } = await loginAdmin()
+  const ownsSession = !options.session
+  const session = options.session || await loginAdmin()
+  const { browser, context, page, adminUrl } = session
 
   try {
     await cleanupUiStand(page, adminUrl, state)
-    removeState()
+    if (options.stateMode !== 'memory') removeState()
     console.log(`[stand:cleanup] removed ${state.runId}`)
   } finally {
-    await context.close().catch(() => {})
-    await browser.close()
+    if (options.stateMode === 'memory') clearActiveState()
+    if (ownsSession) {
+      await context.close().catch(() => {})
+      if (session.ownsBrowser !== false) await browser.close()
+    }
   }
 }
 
-main().catch((error) => {
-  console.error(`[stand:cleanup:error] ${error.stack || error.message}`)
-  process.exitCode = 1
-})
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  cleanupStand().catch((error) => {
+    console.error(`[stand:cleanup:error] ${error.stack || error.message}`)
+    process.exitCode = 1
+  })
+}

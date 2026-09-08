@@ -7,6 +7,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(here, '..')
 export const statePath = resolve(rootDir, '.e2e-stand-state.json')
 const envPath = resolve(rootDir, '.env.stand.local')
+let activeState
 
 export const source = {
   shopId: Number(process.env.E2E_SOURCE_SHOP_ID || 60528),
@@ -26,6 +27,8 @@ export function loadEnv() {
 }
 
 export function readState() {
+  if (activeState) return activeState
+
   if (!existsSync(statePath)) {
     throw new Error(
       `Stand state not found: ${statePath}. Use pnpm e2e:test, pnpm smoke:cycle, or pnpm permissions:cycle.`
@@ -36,7 +39,20 @@ export function readState() {
 }
 
 export function saveState(state) {
+  if (activeState) {
+    activeState = state
+    return
+  }
+
   writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`)
+}
+
+export function setActiveState(state) {
+  activeState = state
+}
+
+export function clearActiveState() {
+  activeState = undefined
 }
 
 export function removeState() {
@@ -70,13 +86,13 @@ function contextOptions() {
   }
 }
 
-export async function loginAdmin() {
+export async function loginAdmin(existingBrowser) {
   loadEnv()
 
   const adminUrl = requiredEnv('ADMIN_URL')
   const adminLogin = requiredEnv('ADMIN_LOGIN')
   const adminPassword = requiredEnv('ADMIN_PASSWORD')
-  const browser = await chromium.launch({ headless: process.env.HEADLESS !== '0', slowMo: browserSlowMo() })
+  const browser = existingBrowser || await chromium.launch({ headless: process.env.HEADLESS !== '0', slowMo: browserSlowMo() })
   const context = await browser.newContext(contextOptions())
   const page = await context.newPage()
 
@@ -91,7 +107,7 @@ export async function loginAdmin() {
   await page.locator('[data-test="LoginForm-Submit"]').click()
   await page.waitForURL((url) => !String(url).includes('/login'))
 
-  return { browser, context, page, adminUrl }
+  return { browser, context, page, adminUrl, ownsBrowser: !existingBrowser }
 }
 
 export function requiredEnv(name) {

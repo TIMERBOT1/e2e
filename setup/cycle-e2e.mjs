@@ -13,7 +13,10 @@ const defaultSpecs = [
 
 function run(command, args) {
   return new Promise((resolve) => {
-    const child = spawn(command, args, { stdio: 'inherit' })
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+      env: { ...process.env, E2E_SUITE: 'functional' }
+    })
     child.on('exit', (code) => resolve(code ?? 1))
   })
 }

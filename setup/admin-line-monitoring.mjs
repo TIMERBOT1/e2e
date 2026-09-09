@@ -416,15 +416,43 @@ async function createMonitoringPositionFromDialog(page, scenario, kind, person) 
   return { positionId, selectedTime, response: data }
 }
 
+async function enableTechnicalBreak(page) {
+  const control = page.locator('[label="Технический перерыв"]').last()
+  const toggle = control.locator('input[role="switch"]')
+  await expect(control).toBeVisible({ timeout: 30_000 })
+  await expect(toggle).toBeAttached({ timeout: 30_000 })
+
+  await poll(async () => {
+    if (await toggle.isChecked().catch(() => false)) return true
+    const clicked = await control
+      .click({ timeout: 3_000 })
+      .then(() => true)
+      .catch(() => false)
+    return clicked && await toggle.isChecked().catch(() => false)
+  }, 'technical break switch enabled', 30_000)
+
+  await expect(toggle).toBeChecked({ timeout: 30_000 })
+  return toggle
+}
+
 async function selectOperator(page, searchTerm) {
   const input = page.getByRole('combobox', { name: 'Поиск сотрудника', exact: false }).last()
-  await expect(input).toBeVisible({ timeout: 30_000 })
-  await input.fill(searchTerm)
   const option = page.getByRole('option').filter({ hasText: searchTerm }).first()
-  await expect(option).toBeVisible({ timeout: 30_000 })
-  const operatorName = (await option.textContent())?.replace(/\s+/g, ' ').trim()
-  await option.click()
-  return operatorName
+
+  return poll(async () => {
+    await enableTechnicalBreak(page)
+    if (!(await input.isVisible({ timeout: 1_000 }).catch(() => false))) return false
+
+    const filled = await input
+      .fill(searchTerm, { timeout: 3_000 })
+      .then(() => true)
+      .catch(() => false)
+    if (!filled || !(await option.isVisible({ timeout: 3_000 }).catch(() => false))) return false
+
+    const operatorName = (await option.textContent())?.replace(/\s+/g, ' ').trim()
+    await option.click()
+    return operatorName || false
+  }, `technical break operator ${searchTerm}`, 60_000)
 }
 
 async function createTechnicalBreakFromDialog(page, scenario, operatorSearchTerm) {
@@ -436,8 +464,9 @@ async function createTechnicalBreakFromDialog(page, scenario, operatorSearchTerm
   await addButton.click()
   await expect(page.getByText('Создание записи', { exact: true })).toBeVisible({ timeout: 30_000 })
 
-  await setSwitchNearText(page, 'Технический перерыв', true)
+  await enableTechnicalBreak(page)
   const operatorName = await selectOperator(page, operatorSearchTerm)
+  await expect(page.locator('[label="Технический перерыв"] input[role="switch"]').last()).toBeChecked()
   await expect(page.getByText(scenario.technicalServiceName, { exact: true })).toBeVisible({ timeout: 30_000 })
   await clickButton(page, nextButton)
 

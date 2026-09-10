@@ -15,12 +15,12 @@ function runPnpm(args) {
 }
 
 async function main() {
-  process.env.E2E_SKIP_NO_SLOTS = '1'
+  process.env.E2E_STAND_PROFILE = 'permissions'
   let code = await run('node', ['setup/prepare-stand.mjs'])
 
   try {
     if (code === 0) code = await run('node', ['setup/prepare-permissions.mjs'])
-    if (code === 0) code = await runPnpm(['test', permissionsSpec])
+    if (code === 0) code = await runPnpm(['exec', 'playwright', 'test', permissionsSpec])
   } finally {
     const permissionsCleanupCode = await run('node', ['setup/cleanup-permissions.mjs'])
     const standCleanupCode = await run('node', ['setup/cleanup-stand.mjs'])

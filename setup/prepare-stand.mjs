@@ -4,9 +4,11 @@ import {
   loginAdmin,
   poll,
   saveState,
+  setActiveState,
   terminalUrl,
   unwrapList
 } from './shared.mjs'
+import { fileURLToPath } from 'node:url'
 import { createTomorrowAppointment } from './admin-line-monitoring.mjs'
 import { findAppointmentToken } from './cleanup-ui.mjs'
 import { createPermissionUser } from './permissions-ui.mjs'
@@ -20,10 +22,8 @@ import {
   startUiCheckpoint
 } from './ui-admin.mjs'
 
-const runId = `e2e-${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}-${Math.random()
-  .toString(36)
-  .slice(2, 6)}`
 const noSlotsTimeSlotSeconds = 60
+const supportedStandProfiles = new Set(['e2e', 'smoke', 'permissions'])
 
 function first(items, label) {
   const item = items.find(Boolean)
@@ -419,7 +419,6 @@ async function createTimedPosition(context, scenario) {
     const mode = await poll(async () => {
       if (await booking.isVisible().catch(() => false)) return 'booking'
       if (await timeslot.isVisible().catch(() => false)) return 'timeslot'
-      if (await page.locator('[data-test="notification-screen"]').isVisible().catch(() => false)) return 'asap'
       return false
     }, 'noSlots terminal booking step', 60_000).catch(async () => {
       const body = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300)
@@ -431,8 +430,6 @@ async function createTimedPosition(context, scenario) {
       needsSlot = true
     } else if (mode === 'timeslot') {
       needsSlot = true
-    } else {
-      throw new Error('noSlots reservation failed: timed booking option not visible')
     }
 
     if (needsSlot) {
@@ -578,99 +575,145 @@ async function createSmokeAppointment(page, adminUrl, state) {
   state.appointment = { id, token, shopId: scenario.shopId, lineId: scenario.lineId, scenarioKey: scenario.key }
 }
 
-async function main() {
-  const { browser, context, page, adminUrl } = await loginAdmin()
+export async function prepareStand(options = {}) {
+  const standProfile = options.profile || process.env.E2E_STAND_PROFILE || 'smoke'
+  const requestedScenarios = options.scenarios ?? process.env.E2E_SCENARIOS
+  const scenarioKeys = Array.isArray(requestedScenarios)
+    ? requestedScenarios
+    : requestedScenarios?.split(',')
+  const selectedE2EScenarios =
+    standProfile === 'e2e' && scenarioKeys !== undefined
+      ? new Set(scenarioKeys.map((key) => key.trim()).filter((key) => key && key !== 'none'))
+      : null
+  const wantsScenario = (key) => selectedE2EScenarios === null || selectedE2EScenarios.has(key)
+  const runId = `e2e-${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`
+
+  if (!supportedStandProfiles.has(standProfile)) {
+    throw new Error(`Unknown E2E_STAND_PROFILE: ${standProfile}`)
+  }
+
+  const isE2E = standProfile === 'e2e'
+  const isSmoke = standProfile === 'smoke'
+  const isPermissions = standProfile === 'permissions'
+  const ownsSession = !options.session
+  const session = options.session || await loginAdmin()
+  const { browser, context, page, adminUrl } = session
   const state = {
     runId,
+    profile: standProfile,
     createdAt: new Date().toISOString(),
     place: null,
     scenarios: {}
   }
+  if (options.stateMode === 'memory') setActiveState(state)
 
   try {
-    await createSmokeLineTemplate(page, adminUrl, state)
+    if (isSmoke || isPermissions) await createSmokeLineTemplate(page, adminUrl, state)
     const shop = await createUiShop(page, adminUrl, runId)
     state.place = { id: Number(shop.id), name: shop.name }
     saveState(state)
 
-    const operator = await createPermissionUser(page, adminUrl, state, 'standOperator')
-    state.technicalBreakOperator = {
-      id: operator.id,
-      firstName: operator.firstName,
-      lastName: operator.lastName,
-      email: operator.email
-    }
-    saveState(state)
-
-    if (process.env.E2E_SKIP_BEACON !== '1') {
-      await createSmokeBeacon(page, adminUrl, state)
-    } else {
-      console.warn('[stand:prepare] beacon creation skipped by E2E_SKIP_BEACON=1')
-    }
-    await createSmokeCallScreen(page, adminUrl, state)
-    await createSmokeTranslation(page, adminUrl, state)
-    await createSmokeTag(page, adminUrl, state)
-    await createSmokeCampaign(page, adminUrl, state)
-    await readSmokeFixtures(page, adminUrl, state)
-    saveState(state)
-
-    await createScenario(page, adminUrl, state, 'timed', {
-      line: {
-        technicalService: true,
-        showTodayBackofficeBooking: true
+    if (isE2E && (options.createOperator ?? process.env.E2E_CREATE_OPERATOR === '1')) {
+      const operator = await createPermissionUser(page, adminUrl, state, 'standOperator')
+      state.technicalBreakOperator = {
+        id: operator.id,
+        firstName: operator.firstName,
+        lastName: operator.lastName,
+        email: operator.email
       }
-    })
-    await createScenario(page, adminUrl, state, 'asap', {
-      line: {
-        asapMode: true,
-        manageAppointments: false,
-        allowFutureAppointments: false,
-        allowAsapTerminalBooking: true,
+      saveState(state)
+    }
+
+    if (isSmoke || isPermissions) {
+      if (process.env.E2E_SKIP_BEACON !== '1') {
+        await createSmokeBeacon(page, adminUrl, state)
+      } else {
+        console.warn('[stand:prepare] beacon creation skipped by E2E_SKIP_BEACON=1')
+      }
+      await createSmokeCampaign(page, adminUrl, state)
+      if (isSmoke) {
+        await createSmokeCallScreen(page, adminUrl, state)
+        await createSmokeTranslation(page, adminUrl, state)
+        await createSmokeTag(page, adminUrl, state)
+        await readSmokeFixtures(page, adminUrl, state)
+      }
+      saveState(state)
+    }
+
+    if (isE2E && wantsScenario('timed')) {
+      await createScenario(page, adminUrl, state, 'timed', {
+        line: {
+          technicalService: true,
+          showTodayBackofficeBooking: true
+        }
+      })
+    }
+    if (!isE2E || wantsScenario('asap')) {
+      await createScenario(page, adminUrl, state, 'asap', {
+        line: {
+          asapMode: true,
+          manageAppointments: false,
+          allowFutureAppointments: false,
+          allowAsapTerminalBooking: true,
+          allowTodayTerminalBooking: false,
+          allowFutureTerminalBooking: false,
+          displayPositionValidate: true
+        }
+      })
+    }
+
+    const needsFutureFinal = isSmoke || isPermissions || (isE2E && wantsScenario('futureFinal'))
+    const needsFutureNoFinal = isE2E && wantsScenario('futureNoFinal')
+    if (needsFutureFinal || needsFutureNoFinal) {
+      const futureLine = {
         allowTodayTerminalBooking: false,
-        allowFutureTerminalBooking: false,
-        displayPositionValidate: true
+        allowFutureTerminalBooking: true,
+        allowFutureAppointments: true
       }
-    })
-    const futureLine = {
-      allowTodayTerminalBooking: false,
-      allowFutureTerminalBooking: true,
-      allowFutureAppointments: true
+
+      if (needsFutureFinal) {
+        const futureAppointmentWithFinalScreen = await createScenario(page, adminUrl, state, 'futureFinal', {
+          line: futureLine,
+          terminal: {
+            displayConfirmationScreen: true
+          }
+        })
+        futureAppointmentWithFinalScreen.staffManagementIds.push(
+          await createUiStaffManagementRecord(
+            page,
+            adminUrl,
+            futureAppointmentWithFinalScreen,
+            futureAppointmentWithFinalScreen.serviceName,
+            futureAppointmentWithFinalScreen.checkpointName
+          )
+        )
+        saveState(state)
+      }
+
+      if (needsFutureNoFinal) {
+        const futureAppointmentWithoutFinalScreen = await createScenario(page, adminUrl, state, 'futureNoFinal', {
+          line: { ...futureLine },
+          terminal: {
+            displayConfirmationScreen: false
+          }
+        })
+        futureAppointmentWithoutFinalScreen.staffManagementIds.push(
+          await createUiStaffManagementRecord(
+            page,
+            adminUrl,
+            futureAppointmentWithoutFinalScreen,
+            futureAppointmentWithoutFinalScreen.serviceName,
+            futureAppointmentWithoutFinalScreen.checkpointName
+          )
+        )
+        saveState(state)
+      }
     }
-    const futureAppointmentWithFinalScreen = await createScenario(page, adminUrl, state, 'futureFinal', {
-      line: futureLine,
-      terminal: {
-        displayConfirmationScreen: true
-      }
-    })
-    futureAppointmentWithFinalScreen.staffManagementIds.push(
-      await createUiStaffManagementRecord(
-        page,
-        adminUrl,
-        futureAppointmentWithFinalScreen,
-        futureAppointmentWithFinalScreen.serviceName,
-        futureAppointmentWithFinalScreen.checkpointName
-      )
-    )
-    saveState(state)
-    const futureAppointmentWithoutFinalScreen = await createScenario(page, adminUrl, state, 'futureNoFinal', {
-      line: {
-        ...futureLine
-      },
-      terminal: {
-        displayConfirmationScreen: false
-      }
-    })
-    futureAppointmentWithoutFinalScreen.staffManagementIds.push(
-      await createUiStaffManagementRecord(
-        page,
-        adminUrl,
-        futureAppointmentWithoutFinalScreen,
-        futureAppointmentWithoutFinalScreen.serviceName,
-        futureAppointmentWithoutFinalScreen.checkpointName
-      )
-    )
-    saveState(state)
-    if (process.env.E2E_SKIP_NO_SLOTS !== '1') {
+
+    const needsNoSlots = isSmoke || (isE2E && wantsScenario('noSlots'))
+    if (needsNoSlots && process.env.E2E_SKIP_NO_SLOTS !== '1') {
       const noSlots = await createScenario(page, adminUrl, state, 'noSlots', {
         line: noSlotsLineOptions()
       })
@@ -681,19 +724,28 @@ async function main() {
       }
       saveState(state)
     }
-    await createBulkDisableScenario(page, adminUrl, state)
-    await createScenario(page, adminUrl, state, 'stoppedCheckpoint', {
-      start: false,
-      line: {
-        displayPositionValidate: true,
-        requestCheckpointHostEditReason: true
-      }
-    })
-    await createScenario(page, adminUrl, state, 'disabledTerminal', { enabled: false })
-    await createSmokeAppointment(page, adminUrl, state)
+
+    if (isE2E && wantsScenario('bulkDisable')) await createBulkDisableScenario(page, adminUrl, state)
+    if (isE2E && wantsScenario('stoppedCheckpoint')) {
+      await createScenario(page, adminUrl, state, 'stoppedCheckpoint', {
+        start: false,
+        line: {
+          displayPositionValidate: true,
+          requestCheckpointHostEditReason: true
+        }
+      })
+    }
+    if (isE2E && wantsScenario('disabledTerminal')) {
+      await createScenario(page, adminUrl, state, 'disabledTerminal', { enabled: false })
+    }
+
+    if (isSmoke) await createSmokeAppointment(page, adminUrl, state)
     saveState(state)
 
-    await poll(async () => {
+    const syncScenario = ['timed', 'asap', 'futureFinal', 'futureNoFinal']
+      .map((key) => state.scenarios[key])
+      .find(Boolean)
+    if (syncScenario) await poll(async () => {
       const terminalPage = await browser.newPage()
       try {
         const serviceResponse = terminalPage.waitForResponse(
@@ -701,7 +753,10 @@ async function main() {
           { timeout: 30_000 }
         ).catch(() => null)
         await terminalPage
-          .goto(terminalUrl(state.scenarios.timed.terminalId), { waitUntil: 'domcontentloaded', timeout: 30_000 })
+          .goto(terminalUrl(syncScenario.terminalId), {
+            waitUntil: 'domcontentloaded',
+            timeout: 30_000
+          })
           .catch(() => null)
         const response = await serviceResponse
         if (!response) return false
@@ -712,17 +767,29 @@ async function main() {
       }
     }, 'terminal sync', 180_000)
 
-    console.log(`[stand:prepare] created ${runId}`)
+    console.log(`[stand:prepare] created ${runId} (${standProfile})`)
     console.log(`[stand:prepare] state ${state.place.id} -> ${Object.keys(state.scenarios).join(', ')}`)
+    return state
   } catch (error) {
     saveState(state)
     console.error(`[stand:prepare:error] ${error.stack || error.message}`)
     await cleanupPreparedState(page, adminUrl, state)
-    process.exitCode = 1
+    throw error
   } finally {
-    await context.close().catch(() => {})
-    await browser.close()
+    if (ownsSession) {
+      await context.close().catch(() => {})
+      if (session.ownsBrowser !== false) await browser.close()
+    }
   }
 }
 
-main()
+async function main() {
+  await prepareStand()
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((error) => {
+    console.error(`[stand:prepare:error] ${error.stack || error.message}`)
+    process.exitCode = 1
+  })
+}

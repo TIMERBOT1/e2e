@@ -1,9 +1,7 @@
-import { BrowserContext, expect, Page, test } from '@playwright/test'
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import type { BrowserContext, Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { findAppointmentToken, removeAppointmentToken, removeMonitoringPosition } from '../../setup/cleanup-ui.mjs'
-import { terminalUrl } from '../../setup/shared.mjs'
+import { readState as readFixtureState, terminalUrl } from '../../setup/shared.mjs'
 import { createFutureAppointmentFromTerminal, fillPersonalData, openTerminal } from '../../setup/terminal-flow.mjs'
 
 type StandScenario = {
@@ -20,20 +18,17 @@ type StandState = {
   scenarios: Record<string, StandScenario>
 }
 
-const rootDir = fileURLToPath(new URL('../..', import.meta.url))
-const statePath = resolve(rootDir, '.e2e-stand-state.json')
 const adminUrl = process.env.ADMIN_URL
 const adminLogin = process.env.ADMIN_LOGIN
 const adminPassword = process.env.ADMIN_PASSWORD
 
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBe(true)
-  return JSON.parse(readFileSync(statePath, 'utf8'))
+  return readFixtureState() as StandState
 }
 
 function getScenario(key: string): StandScenario {
   const scenario = readState().scenarios[key]
-  expect(scenario, `Scenario ${key} is missing in ${statePath}`).toBeDefined()
+  expect(scenario, `Scenario ${key} is missing from the test fixture`).toBeDefined()
   return scenario
 }
 
@@ -93,8 +88,6 @@ async function cleanupAppointmentsByIds(
     await adminPage.close()
   }
 }
-
-test.describe.configure({ mode: 'serial' })
 
 test('timed today creates booking and removes it from monitoring', async ({ page, context }) => {
   const scenario = getScenario('timed')

@@ -1,8 +1,7 @@
-import { expect, Page, test } from '@playwright/test'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import type { Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { findAppointmentToken, removeAppointmentToken } from '../../setup/cleanup-ui.mjs'
+import { readState as readFixtureState, saveState as saveFixtureState } from '../../setup/shared.mjs'
 import {
   completeLineMonitoringPosition,
   createLineMonitoringPosition,
@@ -42,21 +41,17 @@ type StandState = {
   monitoringJournal?: MonitoringJournalRecord[]
 }
 
-const rootDir = fileURLToPath(new URL('../..', import.meta.url))
-const statePath = resolve(rootDir, '.e2e-stand-state.json')
-
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBeTruthy()
-  return JSON.parse(readFileSync(statePath, 'utf8'))
+  return readFixtureState() as StandState
 }
 
 function saveState(state: StandState) {
-  writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`)
+  saveFixtureState(state)
 }
 
 function getScenario(key: string): StandScenario {
   const scenario = readState().scenarios[key]
-  expect(scenario, `Scenario ${key} is missing in ${statePath}`).toBeTruthy()
+  expect(scenario, `Scenario ${key} is missing from the test fixture`).toBeTruthy()
   return scenario
 }
 
@@ -108,7 +103,6 @@ async function createFindAndRemoveTomorrowAppointment(page: Page) {
   await removeAppointmentToken(page, adminUrl!, scenario, person.email, true)
 }
 
-test.describe.configure({ mode: 'serial' })
 test.setTimeout(120_000)
 
 test('line monitoring creates asap position and completes service', async ({ page }) => {
@@ -124,6 +118,9 @@ test('line monitoring creates tomorrow appointment and removes it from appointme
 })
 
 test('position journal shows completed line monitoring positions with details', async ({ page }) => {
+  await createCompleteAndRecord(page, 'asap', 'asap')
+  await createCompleteAndRecord(page, 'timed', 'timed')
+
   const records = (readState().monitoringJournal || []).filter((item) => ['asap', 'timed'].includes(item.kind))
   expect(records.map((item) => item.kind).sort()).toEqual(['asap', 'timed'])
 

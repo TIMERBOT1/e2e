@@ -4,7 +4,10 @@
   "type": "module",
   "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "test": "node -e \"const { spawnSync } = require('node:child_process'); const args = process.argv.slice(1); const paths = args.some((arg) => !arg.startsWith('-')) ? [] : ['specs/admin', 'specs/terminal']; const child = spawnSync('playwright', ['test', ...paths, ...args], { stdio: 'inherit', shell: process.platform === 'win32' }); process.exit(child.status ?? 1)\" --",
+    "test": "node setup/cycle-e2e.mjs",
+    "e2e:test": "node setup/cycle-e2e.mjs",
+    "smoke:test": "playwright test specs/admin/coverage-smoke.spec.ts",
+    "smoke:cycle": "node setup/cycle-stand.mjs",
     "admin:coverage:check": "node setup/check-admin-coverage-matrix.mjs",
     "admin:coverage:report": "node setup/render-admin-coverage-report.mjs",
     "permissions:coverage:check": "node setup/check-admin-permissions-matrix.mjs",
@@ -16,7 +19,7 @@
     "stand:prepare": "node setup/prepare-stand.mjs",
     "stand:cleanup": "node setup/cleanup-stand.mjs",
     "stand:cycle": "node setup/cycle-stand.mjs",
-    "test:video": "STAND_VIDEO=on STAND_SLOW_MO_MS=${STAND_SLOW_MO_MS:-250} playwright test specs/admin specs/terminal"
+    "test:video": "node setup/cycle-e2e-video.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1"

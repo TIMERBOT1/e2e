@@ -17,18 +17,26 @@ pnpm full:cycle
 
 Для Linux/macOS вместо `copy` используйте `cp`.
 
-Перед тестами `stand:prepare` создаёт временные сущности на стенде, а
-`stand:cleanup` удаляет их. Для CI используйте `full:cycle`, чтобы очистка
-выполнялась и при падении тестов.
+Каждый functional E2E-тест через Playwright-фикстуру создаёт только свои
+временные сущности и удаляет их после завершения теста. Внешние
+`stand:prepare` и `stand:cleanup` для `e2e:test` не используются.
+`smoke:cycle` и `permissions:cycle` управляют отдельными стендами своих групп,
+а `full:cycle` последовательно запускает все три независимые группы.
+
+Functional E2E по умолчанию выполняются двумя Playwright worker. Подготовка и
+очистка используют общую авторизованную сессию внутри каждого worker, но данные
+и состояние создаются отдельно для каждого теста. Число worker можно изменить
+через `E2E_WORKERS`; для диагностического последовательного прогона в
+PowerShell используйте `$env:E2E_WORKERS = '1'`.
 
 Полный сгруппированный список сценариев: [TESTS.md](./TESTS.md).
 
 ```bash
-npm run stand:cycle
-npm run stand:prepare
-npm test
-npm run stand:cleanup
-npm run test:video
+pnpm e2e:test
+pnpm smoke:cycle
+pnpm permissions:cycle
+pnpm full:cycle
+pnpm test:video
 ```
 
 ## Переменные окружения
@@ -44,6 +52,9 @@ npm run test:video
 ## CI
 
 Workflow `.github/workflows/e2e.yml` запускается вручную или по расписанию.
+Functional E2E выполняются последовательно одним worker в одной CI job без
+shard. После её завершения, независимо от результата, параллельно запускаются
+job route-smoke и permissions.
 Добавьте в Secrets репозитория `ADMIN_URL`, `ADMIN_LOGIN`,
 `ADMIN_PASSWORD` и `CALL_TERMINAL_BASE_URL`. Отчёт Playwright, screenshots,
 traces и videos сохраняются как артефакты каждого запуска.

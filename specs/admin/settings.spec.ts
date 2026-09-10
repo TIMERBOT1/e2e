@@ -1,4 +1,5 @@
-import { BrowserContext, expect, Page, test } from '@playwright/test'
+import type { BrowserContext, Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { findAppointmentToken, removeAppointmentToken } from '../../setup/cleanup-ui.mjs'
 import { loginAdmin } from '../../setup/admin-line-monitoring.mjs'
 import { createFutureAppointmentFromTerminal } from '../../setup/terminal-flow.mjs'
@@ -83,7 +84,6 @@ function nextDescription(prefix: string) {
   return `${prefix} settings ${Date.now()}`.slice(0, 100)
 }
 
-test.describe.configure({ mode: 'serial' })
 test.setTimeout(120_000)
 
 test('terminal settings enable final screen for future appointment', async ({ page, context }) => {

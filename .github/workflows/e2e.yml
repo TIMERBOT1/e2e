@@ -3,7 +3,8 @@ name: E2E
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *'
+    # 05:00 Asia/Yekaterinburg (UTC+5) = 00:00 UTC.
+    - cron: '0 0 * * *'
 
 permissions:
   contents: read

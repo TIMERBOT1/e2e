@@ -3,6 +3,10 @@ name: E2E
 on:
   workflow_dispatch:
   schedule:
+<<<<<<< HEAD
+=======
+    # 05:00 Asia/Yekaterinburg (UTC+5) = 00:00 UTC.
+>>>>>>> 4db6f9a2cfe611b52fa50d512cae951fb36f1a18
     - cron: '0 0 * * *'
 
 permissions:
@@ -12,21 +16,24 @@ concurrency:
   group: e2e-${{ github.repository }}
   cancel-in-progress: false
 
-jobs:
-  playwright:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      ADMIN_URL: ${{ secrets.ADMIN_URL }}
-      ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN }}
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      CALL_TERMINAL_BASE_URL: ${{ secrets.CALL_TERMINAL_BASE_URL }}
-      TZ: Asia/Yekaterinburg
-      E2E_TIMEZONE: Asia/Yekaterinburg
-      E2E_LOCALE: ru-RU
-      CI: true
-      PLAYWRIGHT_HTML_OPEN: never
+env:
+  ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN }}
+  ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+  CALL_TERMINAL_BASE_URL: ${{ secrets.CALL_TERMINAL_BASE_URL }}
+  TZ: Asia/Yekaterinburg
+  E2E_TIMEZONE: Asia/Yekaterinburg
+  E2E_LOCALE: ru-RU
+  CI: true
+  PLAYWRIGHT_HTML_OPEN: never
 
+jobs:
+  e2e:
+    name: Functional E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      E2E_WORKERS: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,14 +55,98 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install chromium
 
-      - name: Run E2E cycle
-        run: pnpm full:cycle
+      - name: Run functional E2E
+        run: pnpm e2e:test
 
       - name: Upload Playwright artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts-${{ github.run_id }}
+          name: playwright-artifacts-e2e-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            stand-videos/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  smoke:
+    name: Route smoke
+    needs: e2e
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install chromium
+
+      - name: Run route smoke
+        run: pnpm smoke:cycle
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts-smoke-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            stand-videos/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  permissions:
+    name: Permission tests
+    needs: e2e
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install chromium
+
+      - name: Run permission tests
+        run: pnpm permissions:cycle
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts-permissions-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/

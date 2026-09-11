@@ -203,12 +203,12 @@ async function stopCheckpoint(page, adminUrl, scenario) {
 
 async function removeStaffRecord(page, adminUrl, scenario, recordId) {
   const route = `/shops/${scenario.shopId}/lines/${scenario.lineId}/staffManagement`
-  const matcher = (item) => String(item.id) === String(recordId)
-  if (!(await itemExists(page, adminUrl, route, '/api/getStaffManagement', matcher))) return
+  const exists = async () => (await discoverStaffRecordIds(page, adminUrl, scenario)).includes(Number(recordId))
+  if (!(await exists())) return
 
   await open(page, adminUrl, `${route}/${recordId}`)
   await clickTwoStepRemove(page)
-  await waitMissing(page, adminUrl, route, '/api/getStaffManagement', matcher, `staff schedule ${recordId} removed`)
+  await poll(async () => !(await exists()), `staff schedule ${recordId} removed`, 30_000)
 }
 
 async function discoverStaffRecordIds(page, adminUrl, scenario) {

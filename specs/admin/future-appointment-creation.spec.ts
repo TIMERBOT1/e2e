@@ -1,8 +1,6 @@
-import { expect, test } from '@playwright/test'
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import { findAppointment, removeAppointmentToken } from '../../setup/cleanup-ui.mjs'
+import { readState as readFixtureState } from '../../setup/shared.mjs'
 import { open } from '../../setup/ui-admin.mjs'
 import {
   createTomorrowAppointmentFromPositionJournal,
@@ -24,18 +22,14 @@ type StandState = {
   scenarios: Record<string, StandScenario>
 }
 
-const rootDir = fileURLToPath(new URL('../..', import.meta.url))
-const statePath = resolve(rootDir, '.e2e-stand-state.json')
-
 function readState(): StandState {
-  expect(existsSync(statePath), `Run pnpm stand:prepare first. Missing ${statePath}`).toBeTruthy()
-  return JSON.parse(readFileSync(statePath, 'utf8'))
+  return readFixtureState() as StandState
 }
 
 function futureScenario() {
   const state = readState()
   const scenario = state.scenarios.futureFinal
-  expect(scenario, `Scenario futureFinal is missing in ${statePath}`).toBeTruthy()
+  expect(scenario, 'Scenario futureFinal is missing from the test fixture').toBeTruthy()
   return { ...scenario, placeName: state.place.name }
 }
 

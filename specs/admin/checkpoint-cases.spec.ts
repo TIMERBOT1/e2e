@@ -1,4 +1,5 @@
-import { expect, Page, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from '../../setup/e2e-test-fixture'
 import {
   createLineMonitoringPosition,
   expectPositionAbsentFromLineMonitoring,
@@ -425,7 +426,6 @@ async function removePositionIfPresent(
   }).catch(() => undefined)
 }
 
-test.describe.configure({ mode: 'serial' })
 test.setTimeout(180_000)
 
 test('TC-31 creates a service point', async ({ page }) => {

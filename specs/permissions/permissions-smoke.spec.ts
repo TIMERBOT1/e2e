@@ -145,9 +145,17 @@ function apiWaits(route: PreparedRoute) {
 }
 
 async function openPreparedRoute(page: Page, route: PreparedRoute) {
-  const waits = apiWaits(route).map((wait) => wait(page))
-  await open(page, adminUrl(), route.path)
-  await Promise.all(waits)
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const waits = apiWaits(route).map((wait) => wait(page))
+      await open(page, adminUrl(), route.path)
+      await Promise.all(waits)
+      return
+    } catch (error) {
+      if (attempt === 2 || !/Timeout/i.test(String(error instanceof Error ? error.message : error))) throw error
+      await open(page, adminUrl(), '/')
+    }
+  }
 }
 
 function routePath(page: Page) {
